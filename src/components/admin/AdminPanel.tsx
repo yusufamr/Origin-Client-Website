@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { CallRequest } from '../../lib/dataStore';
+import { paginate } from '../../lib/pagination';
 
 const TIME_LABELS: Record<string, string> = {
   any: 'Any time',
@@ -25,6 +26,7 @@ export default function AdminPanel() {
   const [loginError, setLoginError] = useState('');
   const [requests, setRequests] = useState<CallRequest[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
 
   async function loadRequests() {
     setLoading(true);
@@ -72,6 +74,16 @@ export default function AdminPanel() {
     });
   }
 
+  async function handleDelete(id: string) {
+    if (!window.confirm('Are you sure you want to delete this call request?')) return;
+    await fetch('/api/admin/requests', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    await loadRequests();
+  }
+
   if (checkingSession) {
     return <p className="text-slate-500">Loading...</p>;
   }
@@ -103,6 +115,8 @@ export default function AdminPanel() {
     );
   }
 
+  const { items: pageRequests, currentPage, totalPages } = paginate(requests, page);
+
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
@@ -120,40 +134,92 @@ export default function AdminPanel() {
       {requests.length === 0 ? (
         <p className="text-slate-500">No call requests yet.</p>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full min-w-[640px] text-start text-sm">
-            <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3 text-start">Name</th>
-                <th className="px-4 py-3 text-start">Phone</th>
-                <th className="px-4 py-3 text-start">Preferred Time</th>
-                <th className="px-4 py-3 text-start">Submitted</th>
-                <th className="px-4 py-3 text-start">Contacted</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {requests.map((r) => (
-                <tr key={r.id} className={r.contacted ? 'bg-slate-50/60' : ''}>
-                  <td className="px-4 py-3">{r.name || '—'}</td>
-                  <td className="px-4 py-3 font-medium">{r.phone}</td>
-                  <td className="px-4 py-3">{TIME_LABELS[r.time] ?? r.time}</td>
-                  <td className="px-4 py-3 text-slate-500">{formatTimestamp(r.timestamp)}</td>
-                  <td className="px-4 py-3">
-                    <label className="inline-flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={r.contacted}
-                        onChange={(e) => toggleContacted(r.id, e.target.checked)}
-                        className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-                      />
-                      <span>{r.contacted ? 'Contacted' : 'Mark contacted'}</span>
-                    </label>
-                  </td>
+        <>
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table className="w-full min-w-[720px] text-start text-sm">
+              <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-4 py-3 text-start">Name</th>
+                  <th className="px-4 py-3 text-start">Phone</th>
+                  <th className="px-4 py-3 text-start">Preferred Time</th>
+                  <th className="px-4 py-3 text-start">Submitted</th>
+                  <th className="px-4 py-3 text-start">Contacted</th>
+                  <th className="px-4 py-3 text-start">Actions</th>
                 </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {pageRequests.map((r) => (
+                  <tr key={r.id} className={r.contacted ? 'bg-slate-50/60' : ''}>
+                    <td className="px-4 py-3">{r.name || '—'}</td>
+                    <td className="px-4 py-3 font-medium">{r.phone}</td>
+                    <td className="px-4 py-3">{TIME_LABELS[r.time] ?? r.time}</td>
+                    <td className="px-4 py-3 text-slate-500">{formatTimestamp(r.timestamp)}</td>
+                    <td className="px-4 py-3">
+                      <label className="inline-flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={r.contacted}
+                          onChange={(e) => toggleContacted(r.id, e.target.checked)}
+                          className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                        />
+                        <span>{r.contacted ? 'Contacted' : 'Mark contacted'}</span>
+                      </label>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(r.id)}
+                        className="rounded-full border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <nav className="mt-6 flex items-center justify-center gap-2" aria-label="Pagination">
+              <button
+                type="button"
+                onClick={() => setPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700 disabled:pointer-events-none disabled:opacity-40"
+                aria-label="Previous page"
+              >
+                ‹
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  type="button"
+                  key={p}
+                  onClick={() => setPage(p)}
+                  aria-current={p === currentPage ? 'page' : undefined}
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold transition ${
+                    p === currentPage
+                      ? 'border-brand-600 bg-brand-600 text-white'
+                      : 'border-slate-300 text-slate-600 hover:border-brand-600 hover:text-brand-700'
+                  }`}
+                >
+                  {p}
+                </button>
               ))}
-            </tbody>
-          </table>
-        </div>
+
+              <button
+                type="button"
+                onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700 disabled:pointer-events-none disabled:opacity-40"
+                aria-label="Next page"
+              >
+                ›
+              </button>
+            </nav>
+          )}
+        </>
       )}
     </div>
   );

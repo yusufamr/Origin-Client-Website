@@ -88,6 +88,15 @@ export async function setRequestContacted(id: string, contacted: boolean): Promi
   return true;
 }
 
+export async function deleteRequest(id: string): Promise<boolean> {
+  const requests = await getRequests();
+  const index = requests.findIndex((r) => r.id === id);
+  if (index === -1) return false;
+  requests.splice(index, 1);
+  await writeJson(REQUESTS_PATH, requests);
+  return true;
+}
+
 export async function getPortfolioItems(): Promise<PortfolioItem[]> {
   return readJson<PortfolioItem[]>(PORTFOLIO_JSON_PATH, []);
 }

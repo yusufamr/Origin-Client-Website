@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { isAuthorized } from '../../../lib/adminAuth';
-import { getRequests, setRequestContacted } from '../../../lib/dataStore';
+import { deleteRequest, getRequests, setRequestContacted } from '../../../lib/dataStore';
 
 export const GET: APIRoute = async ({ request, cookies }) => {
   if (!isAuthorized(request, cookies)) {
@@ -30,6 +30,27 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
 
   const updated = await setRequestContacted(id, contacted);
   if (!updated) return json({ ok: false, error: 'Request not found.' }, 404);
+
+  return json({ ok: true });
+};
+
+export const DELETE: APIRoute = async ({ request, cookies }) => {
+  if (!isAuthorized(request, cookies)) {
+    return json({ ok: false, error: 'Unauthorized.' }, 401);
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ ok: false, error: 'Invalid request body.' }, 400);
+  }
+
+  const id = typeof body.id === 'string' ? body.id : '';
+  if (!id) return json({ ok: false, error: 'Missing id.' }, 400);
+
+  const removed = await deleteRequest(id);
+  if (!removed) return json({ ok: false, error: 'Request not found.' }, 404);
 
   return json({ ok: true });
 };
