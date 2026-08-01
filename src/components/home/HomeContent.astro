@@ -1,7 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import ServiceCard from '../ServiceCard.astro';
 import WhyUsPoint from '../WhyUsPoint.astro';
 import JsonLd from '../JsonLd.astro';
+import heroWindow from '../../assets/hero-window.jpg';
 import { getLangFromUrl, path, useTranslations } from '../../i18n/utils';
 import { getPortfolioItems, getProducts } from '../../lib/dataStore';
 
@@ -19,8 +21,19 @@ const teaserProducts = allProducts.slice(0, 3);
 
 <JsonLd />
 
-<section class="bg-gradient-to-b from-brand-800 to-brand-950 text-white">
-  <div class="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 sm:px-6 md:py-28">
+<section class="relative overflow-hidden bg-brand-950 text-white">
+  <Image
+    src={heroWindow}
+    alt=""
+    widths={[640, 1024, 1600, 2400]}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+    class="absolute inset-0 h-full w-full object-cover object-left"
+  />
+  <div class="absolute inset-0 bg-gradient-to-b from-brand-950/90 via-brand-950/85 to-brand-950/95" />
+
+  <div class="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 sm:px-6 md:py-28">
     <h1 class="max-w-2xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
       {t.hero.title}
     </h1>
