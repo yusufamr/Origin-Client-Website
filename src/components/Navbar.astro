@@ -12,7 +12,6 @@ const t = useTranslations(lang);
 const navLinks = [
   { href: path('', lang), label: t.nav.home },
   { href: path('portfolio', lang), label: t.nav.portfolio },
-  { href: path('contact', lang), label: t.nav.contact },
 ];
 
 const products = await getProducts();
@@ -56,9 +55,6 @@ const productLinks = products.map((product) => ({
       <a href={navLinks[1].href} class="text-sm font-medium text-slate-700 hover:text-brand-700">
         {navLinks[1].label}
       </a>
-      <a href={navLinks[2].href} class="text-sm font-medium text-slate-700 hover:text-brand-700">
-        {navLinks[2].label}
-      </a>
 
       <a
         href={path('contact', lang)}
@@ -95,9 +91,6 @@ const productLinks = products.map((product) => ({
     ))}
     <a href={navLinks[1].href} class="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50">
       {navLinks[1].label}
-    </a>
-    <a href={navLinks[2].href} class="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50">
-      {navLinks[2].label}
     </a>
     <a
       href={path('contact', lang)}

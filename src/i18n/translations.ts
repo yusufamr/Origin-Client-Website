@@ -10,7 +10,6 @@ export interface Dictionary {
     home: string;
     products: string;
     portfolio: string;
-    contact: string;
     requestCall: string;
   };
   hero: {

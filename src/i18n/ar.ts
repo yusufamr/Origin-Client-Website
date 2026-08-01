@@ -10,7 +10,6 @@ export const ar: Dictionary = {
     home: 'الرئيسية',
     products: 'منتجاتنا',
     portfolio: 'أعمالنا',
-    contact: 'تواصل معنا',
     requestCall: 'اطلب اتصالاً',
   },
   hero: {
