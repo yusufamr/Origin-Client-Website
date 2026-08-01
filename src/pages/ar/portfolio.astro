@@ -1,15 +1,19 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PortfolioGallery from '../../components/portfolio/PortfolioGallery';
-import { useTranslations } from '../../i18n/utils';
+import Pagination from '../../components/Pagination.astro';
+import { path, useTranslations } from '../../i18n/utils';
 import { getPortfolioItems } from '../../lib/dataStore';
+import { paginate } from '../../lib/pagination';
 
 const lang = 'ar' as const;
 const t = useTranslations(lang);
 
-const items = (await getPortfolioItems()).sort(
+const allItems = (await getPortfolioItems()).sort(
   (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
 );
+const requestedPage = Number(Astro.url.searchParams.get('page')) || 1;
+const { items, currentPage, totalPages } = paginate(allItems, requestedPage);
 ---
 
 <BaseLayout title={t.portfolioPage.title} description={t.portfolioPage.description}>
@@ -31,5 +35,7 @@ const items = (await getPortfolioItems()).sort(
         <p class="text-slate-500">{t.portfolioPage.empty}</p>
       )}
     </div>
+
+    <Pagination currentPage={currentPage} totalPages={totalPages} basePath={path('portfolio', lang)} lang={lang} />
   </section>
 </BaseLayout>

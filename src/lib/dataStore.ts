@@ -22,11 +22,13 @@ export interface CallRequest {
 
 export interface PortfolioItem {
   id: string;
-  imagePath: string;
+  images: string[];
   descriptionEn: string;
   descriptionAr: string;
   date: string;
 }
+
+export type PortfolioTextFields = Pick<PortfolioItem, 'descriptionEn' | 'descriptionAr' | 'date'>;
 
 export interface Product {
   id: string;
@@ -91,25 +93,59 @@ export async function getPortfolioItems(): Promise<PortfolioItem[]> {
 }
 
 export async function addPortfolioItem(
-  item: Omit<PortfolioItem, 'id' | 'imagePath'>,
-  imageBuffer: Buffer,
-  imageExt: string
+  fields: PortfolioTextFields,
+  images: ImageUpload[]
 ): Promise<PortfolioItem> {
   await mkdir(PORTFOLIO_IMAGES_DIR, { recursive: true });
   const id = Date.now().toString();
-  const filename = `${id}${imageExt}`;
-  await writeFile(path.join(PORTFOLIO_IMAGES_DIR, filename), imageBuffer);
 
-  const newItem: PortfolioItem = {
-    id,
-    imagePath: `/portfolio/${filename}`,
-    ...item,
-  };
+  const imagePaths: string[] = [];
+  for (const [i, image] of images.entries()) {
+    const filename = `${id}-${i}${image.ext}`;
+    await writeFile(path.join(PORTFOLIO_IMAGES_DIR, filename), image.buffer);
+    imagePaths.push(`/portfolio/${filename}`);
+  }
+
+  const newItem: PortfolioItem = { id, images: imagePaths, ...fields };
 
   const items = await getPortfolioItems();
   items.push(newItem);
   await writeJson(PORTFOLIO_JSON_PATH, items);
   return newItem;
+}
+
+export async function updatePortfolioItem(
+  id: string,
+  fields: PortfolioTextFields,
+  newImages: ImageUpload[],
+  removeImagePaths: string[]
+): Promise<PortfolioItem | null> {
+  const items = await getPortfolioItems();
+  const index = items.findIndex((i) => i.id === id);
+  if (index === -1) return null;
+
+  const item = items[index];
+  Object.assign(item, fields);
+
+  if (removeImagePaths.length) {
+    item.images = item.images.filter((img) => !removeImagePaths.includes(img));
+    for (const imgPath of removeImagePaths) {
+      await unlinkPublicFile(imgPath);
+    }
+  }
+
+  if (newImages.length) {
+    await mkdir(PORTFOLIO_IMAGES_DIR, { recursive: true });
+    for (const [i, image] of newImages.entries()) {
+      const filename = `${id}-${Date.now()}-${i}${image.ext}`;
+      await writeFile(path.join(PORTFOLIO_IMAGES_DIR, filename), image.buffer);
+      item.images.push(`/portfolio/${filename}`);
+    }
+  }
+
+  items[index] = item;
+  await writeJson(PORTFOLIO_JSON_PATH, items);
+  return item;
 }
 
 export async function deletePortfolioItem(id: string): Promise<boolean> {
@@ -120,10 +156,8 @@ export async function deletePortfolioItem(id: string): Promise<boolean> {
   const [removed] = items.splice(index, 1);
   await writeJson(PORTFOLIO_JSON_PATH, items);
 
-  try {
-    await unlink(path.join(ROOT, 'public', removed.imagePath.replace(/^\//, '')));
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
+  for (const imgPath of removed.images) {
+    await unlinkPublicFile(imgPath);
   }
 
   return true;

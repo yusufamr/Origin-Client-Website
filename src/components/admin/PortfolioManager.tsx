@@ -1,10 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { PortfolioItem } from '../../lib/dataStore';
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
+interface PortfolioFormState {
+  descriptionEn: string;
+  descriptionAr: string;
+  date: string;
+}
+
 function today(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function formToData(form: PortfolioFormState): FormData {
+  const data = new FormData();
+  data.append('descriptionEn', form.descriptionEn.trim());
+  data.append('descriptionAr', form.descriptionAr.trim());
+  data.append('date', form.date);
+  return data;
 }
 
 export default function PortfolioManager() {
@@ -16,14 +30,12 @@ export default function PortfolioManager() {
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [descriptionAr, setDescriptionAr] = useState('');
-  const [descriptionEn, setDescriptionEn] = useState('');
-  const [date, setDate] = useState(today());
-  const [fileWarning, setFileWarning] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [addForm, setAddForm] = useState<PortfolioFormState>({ descriptionEn: '', descriptionAr: '', date: today() });
+  const [addFileWarning, setAddFileWarning] = useState('');
+  const [addSubmitting, setAddSubmitting] = useState(false);
+  const [addError, setAddError] = useState('');
+  const [addSuccess, setAddSuccess] = useState(false);
+  const addFileInputRef = useRef<HTMLInputElement>(null);
 
   async function loadItems() {
     setLoading(true);
@@ -62,58 +74,50 @@ export default function PortfolioManager() {
     }
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file && file.size > MAX_SIZE_BYTES) {
-      setFileWarning('Image exceeds the 5MB limit. Please choose a smaller file.');
-    } else {
-      setFileWarning('');
-    }
+  function handleAddFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    const oversized = files.some((f) => f.size > MAX_SIZE_BYTES);
+    setAddFileWarning(oversized ? 'One or more images exceed the 5MB limit.' : '');
   }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitError('');
-    setSubmitSuccess(false);
+    setAddError('');
+    setAddSuccess(false);
 
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) {
-      setSubmitError('Please select an image.');
+    const files = Array.from(addFileInputRef.current?.files ?? []);
+    if (files.length === 0) {
+      setAddError('Please select at least one photo.');
       return;
     }
-    if (file.size > MAX_SIZE_BYTES) {
-      setSubmitError('Image exceeds the 5MB limit.');
+    if (files.some((f) => f.size > MAX_SIZE_BYTES)) {
+      setAddError('Each image must be under 5MB.');
       return;
     }
-    if (!descriptionAr.trim() || !descriptionEn.trim()) {
-      setSubmitError('Both Arabic and English descriptions are required.');
+    if (!addForm.descriptionAr.trim() || !addForm.descriptionEn.trim()) {
+      setAddError('Both Arabic and English descriptions are required.');
       return;
     }
 
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('descriptionAr', descriptionAr.trim());
-    formData.append('descriptionEn', descriptionEn.trim());
-    formData.append('date', date);
+    const data = formToData(addForm);
+    files.forEach((f) => data.append('images', f));
 
-    setSubmitting(true);
+    setAddSubmitting(true);
     try {
-      const res = await fetch('/api/portfolio/add', { method: 'POST', body: formData });
+      const res = await fetch('/api/portfolio/add', { method: 'POST', body: data });
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Upload failed.');
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Upload failed.');
       }
-      setSubmitSuccess(true);
-      setDescriptionAr('');
-      setDescriptionEn('');
-      setDate(today());
-      setFileWarning('');
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      setAddSuccess(true);
+      setAddForm({ descriptionEn: '', descriptionAr: '', date: today() });
+      setAddFileWarning('');
+      if (addFileInputRef.current) addFileInputRef.current.value = '';
       await loadItems();
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Upload failed.');
+      setAddError(err instanceof Error ? err.message : 'Upload failed.');
     } finally {
-      setSubmitting(false);
+      setAddSubmitting(false);
     }
   }
 
@@ -164,19 +168,20 @@ export default function PortfolioManager() {
         <h2 className="text-lg font-bold text-slate-900">Add New Portfolio Item</h2>
         <form onSubmit={handleAdd} className="mt-4 max-w-lg space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-slate-700">
-              Image (JPG, PNG, or WebP — max 5MB)
+            <label htmlFor="images" className="block text-sm font-medium text-slate-700">
+              Photos (JPG, PNG, or WebP — max 5MB each, at least one required)
             </label>
             <input
-              id="image"
-              ref={fileInputRef}
+              id="images"
+              ref={addFileInputRef}
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileChange}
+              multiple
+              onChange={handleAddFilesChange}
               required
               className="mt-1.5 block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100"
             />
-            {fileWarning && <p className="mt-1 text-sm text-amber-600">{fileWarning}</p>}
+            {addFileWarning && <p className="mt-1 text-sm text-amber-600">{addFileWarning}</p>}
           </div>
 
           <div>
@@ -185,8 +190,8 @@ export default function PortfolioManager() {
             </label>
             <textarea
               id="descriptionAr"
-              value={descriptionAr}
-              onChange={(e) => setDescriptionAr(e.target.value)}
+              value={addForm.descriptionAr}
+              onChange={(e) => setAddForm((f) => ({ ...f, descriptionAr: e.target.value }))}
               dir="rtl"
               required
               rows={2}
@@ -200,8 +205,8 @@ export default function PortfolioManager() {
             </label>
             <textarea
               id="descriptionEn"
-              value={descriptionEn}
-              onChange={(e) => setDescriptionEn(e.target.value)}
+              value={addForm.descriptionEn}
+              onChange={(e) => setAddForm((f) => ({ ...f, descriptionEn: e.target.value }))}
               required
               rows={2}
               className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
@@ -215,22 +220,22 @@ export default function PortfolioManager() {
             <input
               id="date"
               type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={addForm.date}
+              onChange={(e) => setAddForm((f) => ({ ...f, date: e.target.value }))}
               required
               className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
             />
           </div>
 
-          {submitError && <p className="text-sm text-red-600">{submitError}</p>}
-          {submitSuccess && <p className="text-sm text-green-700">Portfolio item added successfully.</p>}
+          {addError && <p className="text-sm text-red-600">{addError}</p>}
+          {addSuccess && <p className="text-sm text-green-700">Portfolio item added successfully.</p>}
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={addSubmitting}
             className="w-full rounded-full bg-brand-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? 'Uploading...' : 'Add Item'}
+            {addSubmitting ? 'Uploading...' : 'Add Item'}
           </button>
         </form>
       </section>
@@ -251,31 +256,165 @@ export default function PortfolioManager() {
         {items.length === 0 ? (
           <p className="mt-4 text-slate-500">No portfolio items yet.</p>
         ) : (
-          <div className="mt-4 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          <div className="mt-4 space-y-6">
             {items.map((item) => (
-              <div key={item.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div className="aspect-[4/3] overflow-hidden bg-slate-100">
-                  <img src={item.imagePath} alt={item.descriptionEn} className="h-full w-full object-cover" />
-                </div>
-                <div className="p-4">
-                  <p className="text-sm text-slate-700">{item.descriptionEn}</p>
-                  <p className="mt-1 text-sm text-slate-500" dir="rtl">
-                    {item.descriptionAr}
-                  </p>
-                  <p className="mt-2 text-xs text-slate-400">{item.date}</p>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(item.id)}
-                    className="mt-3 w-full rounded-full border border-red-200 px-4 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+              <PortfolioItemEditor key={item.id} item={item} onSaved={loadItems} onDelete={() => handleDelete(item.id)} />
             ))}
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+interface PortfolioItemEditorProps {
+  item: PortfolioItem;
+  onSaved: () => Promise<void>;
+  onDelete: () => void;
+}
+
+function PortfolioItemEditor({ item, onSaved, onDelete }: PortfolioItemEditorProps) {
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState<PortfolioFormState>({
+    descriptionEn: item.descriptionEn,
+    descriptionAr: item.descriptionAr,
+    date: item.date,
+  });
+  const [removeImages, setRemoveImages] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const newFilesRef = useRef<HTMLInputElement>(null);
+
+  function toggleRemoveImage(imagePath: string) {
+    setRemoveImages((prev) => (prev.includes(imagePath) ? prev.filter((p) => p !== imagePath) : [...prev, imagePath]));
+  }
+
+  async function handleSave() {
+    setSaveError('');
+    if (!form.descriptionEn.trim() || !form.descriptionAr.trim() || !form.date) {
+      setSaveError('Both descriptions and a date are required.');
+      return;
+    }
+
+    const data = formToData(form);
+    data.append('id', item.id);
+    data.append('removeImages', JSON.stringify(removeImages));
+    Array.from(newFilesRef.current?.files ?? []).forEach((f) => data.append('newImages', f));
+
+    setSaving(true);
+    try {
+      const res = await fetch('/api/portfolio/update', { method: 'POST', body: data });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to save changes.');
+      }
+      setRemoveImages([]);
+      if (newFilesRef.current) newFilesRef.current.value = '';
+      setEditing(false);
+      await onSaved();
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to save changes.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-sm text-slate-700">{item.descriptionEn}</p>
+          <p className="mt-1 text-sm text-slate-500" dir="rtl">
+            {item.descriptionAr}
+          </p>
+          <p className="mt-2 text-xs text-slate-400">{item.date}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => setEditing((v) => !v)} className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-brand-600 hover:text-brand-700">
+            {editing ? 'Cancel' : 'Edit'}
+          </button>
+          <button type="button" onClick={onDelete} className="rounded-full border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50">
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3 md:grid-cols-4">
+        {item.images.map((img) => (
+          <div key={img} className="relative overflow-hidden rounded-xl border border-slate-200">
+            <img src={img} alt={item.descriptionEn} className="aspect-[4/3] w-full object-cover" />
+            {editing && (
+              <button
+                type="button"
+                onClick={() => toggleRemoveImage(img)}
+                className={`absolute end-1 top-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                  removeImages.includes(img) ? 'bg-red-600 text-white' : 'bg-white/90 text-red-600'
+                }`}
+              >
+                {removeImages.includes(img) ? 'Removing' : 'Remove'}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {editing && (
+        <div className="mt-6 space-y-4 border-t border-slate-100 pt-6">
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Description (Arabic)</label>
+            <textarea
+              value={form.descriptionAr}
+              onChange={(e) => setForm((f) => ({ ...f, descriptionAr: e.target.value }))}
+              dir="rtl"
+              rows={2}
+              className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Description (English)</label>
+            <textarea
+              value={form.descriptionEn}
+              onChange={(e) => setForm((f) => ({ ...f, descriptionEn: e.target.value }))}
+              rows={2}
+              className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Date</label>
+            <input
+              type="date"
+              value={form.date}
+              onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+              className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
+            />
+          </div>
+
+          <div>
+            <label htmlFor={`new-images-${item.id}`} className="block text-sm font-medium text-slate-700">
+              Add More Photos (optional)
+            </label>
+            <input
+              id={`new-images-${item.id}`}
+              ref={newFilesRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="mt-1.5 block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100"
+            />
+          </div>
+
+          {saveError && <p className="text-sm text-red-600">{saveError}</p>}
+
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full rounded-full bg-brand-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          >
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,51 +1,96 @@
 [
   {
     "id": "1721760000000",
-    "imagePath": "/portfolio/portfolio-1.jpg",
+    "images": [
+      "/portfolio/portfolio-1.jpg"
+    ],
     "descriptionEn": "Full UPVC window replacement for a residential villa, including sliding and casement units.",
     "descriptionAr": "استبدال كامل لنوافذ UPVC في فيلا سكنية، شمل وحدات منزلقة ومفصلية.",
     "date": "2026-01-12"
   },
   {
     "id": "1721760100000",
-    "imagePath": "/portfolio/portfolio-2.jpg",
+    "images": [
+      "/portfolio/portfolio-2.jpg"
+    ],
     "descriptionEn": "Custom shower cabin installation for a family bathroom renovation.",
     "descriptionAr": "تركيب كبينة استحمام مخصصة ضمن تجديد حمام عائلي.",
     "date": "2026-02-03"
   },
   {
     "id": "1721760200000",
-    "imagePath": "/portfolio/portfolio-3.jpg",
+    "images": [
+      "/portfolio/portfolio-3.jpg"
+    ],
     "descriptionEn": "Motorized roller shutters installed across a retail storefront for after-hours security.",
     "descriptionAr": "تركيب رولر شتر آلي لواجهة محل تجاري لتوفير الأمان بعد ساعات الدوام.",
     "date": "2026-02-20"
   },
   {
     "id": "1721760300000",
-    "imagePath": "/portfolio/portfolio-4.jpg",
+    "images": [
+      "/portfolio/portfolio-4.jpg"
+    ],
     "descriptionEn": "UPVC casement windows fitted throughout a multi-unit apartment building.",
     "descriptionAr": "تركيب نوافذ UPVC مفصلية في مبنى سكني متعدد الشقق.",
     "date": "2026-03-08"
   },
   {
     "id": "1721760400000",
-    "imagePath": "/portfolio/portfolio-5.jpg",
+    "images": [
+      "/portfolio/portfolio-5.jpg"
+    ],
     "descriptionEn": "Corner-fit shower cabin with frosted glass panel for a modern bathroom upgrade.",
     "descriptionAr": "كبينة استحمام زاوية بلوح زجاجي مصنفر ضمن تحديث حمام عصري.",
     "date": "2026-03-27"
   },
   {
     "id": "1721760500000",
-    "imagePath": "/portfolio/portfolio-6.jpg",
+    "images": [
+      "/portfolio/portfolio-6.jpg"
+    ],
     "descriptionEn": "Manual roller shutters installed on ground-floor apartment windows for added privacy.",
     "descriptionAr": "تركيب رولر شتر يدوي لنوافذ شقة أرضية لتوفير خصوصية إضافية.",
     "date": "2026-04-15"
   },
   {
     "id": "1785181043231",
-    "imagePath": "/portfolio/1785181043231.jpg",
+    "images": [
+      "/portfolio/1785181043231.jpg",
+      "/portfolio/1785181043231-1785591673542-0.jpg",
+      "/portfolio/1785181043231-1785591673547-1.png",
+      "/portfolio/1785181043231-1785591673552-2.jpg",
+      "/portfolio/1785181043231-1785591673564-3.jpg"
+    ],
     "descriptionAr": "شباك بفس",
     "descriptionEn": "window pvc",
     "date": "2026-07-27"
+  },
+  {
+    "id": "1785591714633",
+    "images": [
+      "/portfolio/1785591714633-0.jpg"
+    ],
+    "descriptionAr": "ش",
+    "descriptionEn": "a",
+    "date": "2026-08-01"
+  },
+  {
+    "id": "1785591727658",
+    "images": [
+      "/portfolio/1785591727658-0.webp"
+    ],
+    "descriptionAr": "شس",
+    "descriptionEn": "as",
+    "date": "2026-08-01"
+  },
+  {
+    "id": "1785591749525",
+    "images": [
+      "/portfolio/1785591749525-0.png"
+    ],
+    "descriptionAr": "بيش",
+    "descriptionEn": "fsa",
+    "date": "2026-08-01"
   }
 ]

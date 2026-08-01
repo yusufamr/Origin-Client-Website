@@ -96,4 +96,9 @@ export interface Dictionary {
     languageSwitch: string;
     close: string;
   };
+  pagination: {
+    previous: string;
+    next: string;
+    pageLabel: string;
+  };
 }

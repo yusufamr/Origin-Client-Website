@@ -122,4 +122,9 @@ export const ar: Dictionary = {
     languageSwitch: 'English',
     close: 'إغلاق',
   },
+  pagination: {
+    previous: 'السابق',
+    next: 'التالي',
+    pageLabel: 'صفحة',
+  },
 };

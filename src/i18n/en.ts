@@ -126,4 +126,9 @@ export const en: Dictionary = {
     languageSwitch: 'العربية',
     close: 'Close',
   },
+  pagination: {
+    previous: 'Previous',
+    next: 'Next',
+    pageLabel: 'Page',
+  },
 };

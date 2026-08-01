@@ -1,0 +1,60 @@
+---
+import Icon from './Icon.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  basePath: string;
+  lang: Lang;
+}
+
+const { currentPage, totalPages, basePath, lang } = Astro.props;
+const t = useTranslations(lang);
+
+function pageHref(page: number): string {
+  return page <= 1 ? basePath : `${basePath}?page=${page}`;
+}
+---
+
+{
+  totalPages > 1 && (
+    <nav class="mt-10 flex items-center justify-center gap-2" aria-label={t.pagination.pageLabel}>
+      <a
+        href={pageHref(Math.max(1, currentPage - 1))}
+        aria-disabled={currentPage === 1}
+        class={`flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700 ${
+          currentPage === 1 ? 'pointer-events-none opacity-40' : ''
+        }`}
+        aria-label={t.pagination.previous}
+      >
+        <Icon name="chevron-left" class="h-4 w-4 rtl:rotate-180" />
+      </a>
+
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        <a
+          href={pageHref(page)}
+          aria-current={page === currentPage ? 'page' : undefined}
+          class={`flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold transition ${
+            page === currentPage
+              ? 'border-brand-600 bg-brand-600 text-white'
+              : 'border-slate-300 text-slate-600 hover:border-brand-600 hover:text-brand-700'
+          }`}
+        >
+          {page}
+        </a>
+      ))}
+
+      <a
+        href={pageHref(Math.min(totalPages, currentPage + 1))}
+        aria-disabled={currentPage === totalPages}
+        class={`flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700 ${
+          currentPage === totalPages ? 'pointer-events-none opacity-40' : ''
+        }`}
+        aria-label={t.pagination.next}
+      >
+        <Icon name="chevron-right" class="h-4 w-4 rtl:rotate-180" />
+      </a>
+    </nav>
+  )
+}

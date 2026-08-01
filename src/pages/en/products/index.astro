@@ -1,13 +1,17 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ServiceCard from '../../../components/ServiceCard.astro';
+import Pagination from '../../../components/Pagination.astro';
 import { path, useTranslations } from '../../../i18n/utils';
 import { getProducts } from '../../../lib/dataStore';
+import { paginate } from '../../../lib/pagination';
 
 const lang = 'en' as const;
 const t = useTranslations(lang);
 
-const products = await getProducts();
+const allProducts = await getProducts();
+const requestedPage = Number(Astro.url.searchParams.get('page')) || 1;
+const { items: products, currentPage, totalPages } = paginate(allProducts, requestedPage);
 ---
 
 <BaseLayout title={t.productsPage.title} description={t.productsPage.description}>
@@ -30,5 +34,7 @@ const products = await getProducts();
     ) : (
       <p class="mt-10 text-slate-500">{t.productsPage.empty}</p>
     )}
+
+    <Pagination currentPage={currentPage} totalPages={totalPages} basePath={path('products', lang)} lang={lang} />
   </section>
 </BaseLayout>
