@@ -9,8 +9,7 @@ import sitemap from '@astrojs/sitemap';
 
 import node from '@astrojs/node';
 
-// TODO: replace with the client's real production domain before launch
-const SITE_URL = 'https://www.originupvc.example';
+const SITE_URL = 'https://www.originupvc.com';
 
 // https://astro.build/config
 export default defineConfig({

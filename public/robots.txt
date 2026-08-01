@@ -3,7 +3,7 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /admin/portfolio
+Disallow: /admin/products
 Disallow: /api/
 
-# TODO: replace with the client's real production domain before launch
-Sitemap: https://www.originupvc.example/sitemap-index.xml
+Sitemap: https://www.originupvc.com/sitemap-index.xml
