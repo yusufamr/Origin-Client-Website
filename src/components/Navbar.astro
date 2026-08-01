@@ -1,0 +1,121 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import LanguageSwitcher from './LanguageSwitcher';
+import logo from '../assets/logo.png';
+import { getLangFromUrl, path, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const navLinks = [
+  { href: path('', lang), label: t.nav.home },
+  { href: path('portfolio', lang), label: t.nav.portfolio },
+  { href: path('contact', lang), label: t.nav.contact },
+];
+
+const productLinks = [
+  { href: path('products/windows', lang), label: t.productNav.windows },
+  { href: path('products/shower-cabins', lang), label: t.productNav.showerCabins },
+  { href: path('products/shutters', lang), label: t.productNav.shutters },
+];
+---
+
+<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+  <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6" aria-label="Primary">
+    <a href={path('', lang)} class="flex items-center">
+      <Image src={logo} alt="Origin UPVC" class="h-10 w-auto sm:h-11" loading="eager" fetchpriority="high" />
+    </a>
+
+    <div class="hidden items-center gap-6 md:flex">
+      <a href={navLinks[0].href} class="text-sm font-medium text-slate-700 hover:text-brand-700">
+        {navLinks[0].label}
+      </a>
+
+      <details class="group relative">
+        <summary class="flex cursor-pointer list-none items-center gap-1 text-sm font-medium text-slate-700 hover:text-brand-700">
+          {t.nav.products}
+          <Icon name="chevron-down" class="h-4 w-4 transition group-open:rotate-180" />
+        </summary>
+        <div class="absolute start-0 top-full z-10 mt-2 w-56 rounded-lg border border-slate-200 bg-white py-2 shadow-lg">
+          {productLinks.map((link) => (
+            <a href={link.href} class="block px-4 py-2 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700">
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </details>
+
+      <a href={navLinks[1].href} class="text-sm font-medium text-slate-700 hover:text-brand-700">
+        {navLinks[1].label}
+      </a>
+      <a href={navLinks[2].href} class="text-sm font-medium text-slate-700 hover:text-brand-700">
+        {navLinks[2].label}
+      </a>
+
+      <a
+        href={path('contact', lang)}
+        class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+      >
+        {t.nav.requestCall}
+      </a>
+
+      <LanguageSwitcher client:load currentLang={lang} currentPath={Astro.url.pathname} />
+    </div>
+
+    <button
+      type="button"
+      id="mobile-menu-button"
+      class="flex items-center justify-center rounded-md p-2 text-slate-700 md:hidden"
+      aria-label={t.nav.home}
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span id="mobile-menu-icon-open"><Icon name="menu" class="h-6 w-6" /></span>
+      <span id="mobile-menu-icon-close" class="hidden"><Icon name="close" class="h-6 w-6" /></span>
+    </button>
+  </nav>
+
+  <div id="mobile-menu" class="hidden flex-col gap-1 border-t border-slate-200 bg-white px-4 pb-4 pt-2 md:hidden">
+    <a href={navLinks[0].href} class="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50">
+      {navLinks[0].label}
+    </a>
+    <p class="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{t.nav.products}</p>
+    {productLinks.map((link) => (
+      <a href={link.href} class="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50">
+        {link.label}
+      </a>
+    ))}
+    <a href={navLinks[1].href} class="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50">
+      {navLinks[1].label}
+    </a>
+    <a href={navLinks[2].href} class="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50">
+      {navLinks[2].label}
+    </a>
+    <a
+      href={path('contact', lang)}
+      class="mt-2 rounded-full bg-brand-600 px-4 py-2 text-center text-sm font-semibold text-white"
+    >
+      {t.nav.requestCall}
+    </a>
+    <div class="mt-2">
+      <LanguageSwitcher client:load currentLang={lang} currentPath={Astro.url.pathname} />
+    </div>
+  </div>
+</header>
+
+<script>
+  const button = document.getElementById('mobile-menu-button');
+  const menu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('mobile-menu-icon-open');
+  const iconClose = document.getElementById('mobile-menu-icon-close');
+
+  button?.addEventListener('click', () => {
+    const isOpen = menu?.classList.contains('flex');
+    menu?.classList.toggle('hidden', isOpen);
+    menu?.classList.toggle('flex', !isOpen);
+    iconOpen?.classList.toggle('hidden', !isOpen);
+    iconClose?.classList.toggle('hidden', isOpen);
+    button.setAttribute('aria-expanded', String(!isOpen));
+  });
+</script>

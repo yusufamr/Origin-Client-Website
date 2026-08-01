@@ -1,0 +1,45 @@
+---
+import { getLangFromUrl, getLocalizedPath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  description?: string;
+  noindex?: boolean;
+  ogImage?: string;
+}
+
+const { title, description, noindex = false, ogImage = '/og-default.jpg' } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const pageDescription = description ?? t.meta.defaultDescription;
+const fullTitle = `${title} | ${t.meta.titleSuffix}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
+const arAlternate = new URL(getLocalizedPath(Astro.url.pathname, 'ar'), Astro.site);
+const enAlternate = new URL(getLocalizedPath(Astro.url.pathname, 'en'), Astro.site);
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={pageDescription} />
+<link rel="canonical" href={canonicalURL} />
+
+{noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}
+
+<link rel="alternate" hreflang="ar" href={arAlternate} />
+<link rel="alternate" hreflang="en" href={enAlternate} />
+<link rel="alternate" hreflang="x-default" href={arAlternate} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={t.meta.titleSuffix} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={pageDescription} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:locale" content={lang === 'ar' ? 'ar_AR' : 'en_US'} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={pageDescription} />
+<meta name="twitter:image" content={ogImageURL} />

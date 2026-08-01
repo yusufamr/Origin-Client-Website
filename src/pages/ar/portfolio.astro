@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PortfolioGallery from '../../components/portfolio/PortfolioGallery';
+import { useTranslations } from '../../i18n/utils';
+import { getPortfolioItems } from '../../lib/dataStore';
+
+const lang = 'ar' as const;
+const t = useTranslations(lang);
+
+const items = (await getPortfolioItems()).sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+);
+---
+
+<BaseLayout title={t.portfolioPage.title} description={t.portfolioPage.description}>
+  <section class="mx-auto max-w-6xl px-4 py-14 sm:px-6 md:py-16">
+    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.portfolioPage.title}</h1>
+    <p class="mt-3 max-w-2xl text-slate-600">{t.portfolioPage.intro}</p>
+
+    <div class="mt-10">
+      {items.length > 0 ? (
+        <PortfolioGallery
+          client:load
+          items={items}
+          lang={lang}
+          dateLabel={t.portfolioPage.dateLabel}
+          viewImageLabel={t.portfolioPage.viewImage}
+          closeLabel={t.common.close}
+        />
+      ) : (
+        <p class="text-slate-500">{t.portfolioPage.empty}</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>

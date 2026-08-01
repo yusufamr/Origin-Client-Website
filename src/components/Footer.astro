@@ -1,0 +1,88 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import logo from '../assets/logo.png';
+import { getLangFromUrl, path, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+
+const quickLinks = [
+  { href: path('', lang), label: t.nav.home },
+  { href: path('products/windows', lang), label: t.productNav.windows },
+  { href: path('products/shower-cabins', lang), label: t.productNav.showerCabins },
+  { href: path('products/shutters', lang), label: t.productNav.shutters },
+  { href: path('portfolio', lang), label: t.nav.portfolio },
+  { href: path('contact', lang), label: t.nav.contact },
+];
+
+// TODO: replace with client's real social media URLs
+const socialLinks = [
+  { name: 'instagram' as const, label: t.social.instagram, href: '#' },
+  { name: 'tiktok' as const, label: t.social.tiktok, href: '#' },
+  { name: 'facebook' as const, label: t.social.facebook, href: '#' },
+  { name: 'youtube' as const, label: t.social.youtube, href: '#' },
+  { name: 'whatsapp' as const, label: t.social.whatsapp, href: '#' },
+];
+---
+
+<footer class="border-t border-slate-200 bg-slate-50">
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-3">
+    <div>
+      <Image src={logo} alt="Origin UPVC" class="h-12 w-auto" />
+      <p class="mt-3 max-w-xs text-sm text-slate-600">{t.footer.tagline}</p>
+
+      <div class="mt-5 flex gap-3">
+        {socialLinks.map((social) => (
+          <a
+            href={social.href}
+            aria-label={social.label}
+            class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700"
+          >
+            <!-- TODO: replace with client asset -->
+            <Icon name={social.name} class="h-4 w-4" />
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">{t.footer.quickLinks}</p>
+      <ul class="mt-4 space-y-2">
+        {quickLinks.map((link) => (
+          <li>
+            <a href={link.href} class="text-sm text-slate-600 hover:text-brand-700">{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">{t.footer.contactUs}</p>
+      <ul class="mt-4 space-y-3 text-sm text-slate-600">
+        <li class="flex items-center gap-2">
+          <Icon name="phone" class="h-4 w-4 shrink-0 text-brand-600" />
+          <!-- TODO: replace with client asset -->
+          <span>{t.footer.phone}</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <Icon name="whatsapp" class="h-4 w-4 shrink-0 text-brand-600" />
+          <!-- TODO: replace with client asset -->
+          <a href="#" class="hover:text-brand-700">{t.footer.whatsapp}: {t.footer.phone}</a>
+        </li>
+        <li class="flex items-center gap-2">
+          <Icon name="map-pin" class="h-4 w-4 shrink-0 text-brand-600" />
+          <!-- TODO: replace with client asset -->
+          <span>{t.footer.address}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-slate-200 py-5">
+    <p class="mx-auto max-w-6xl px-4 text-center text-xs text-slate-500 sm:px-6">
+      &copy; {year} {t.footer.copyright}
+    </p>
+  </div>
+</footer>

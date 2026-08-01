@@ -1,0 +1,25 @@
+---
+import AdminLayout from '../layouts/AdminLayout.astro';
+import AdminPanel from '../components/admin/AdminPanel';
+---
+
+<AdminLayout title="Call Requests">
+  <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-xl font-extrabold text-brand-700">Origin UPVC Admin</p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-900">Call Requests</h1>
+      </div>
+      <a
+        href="/admin/portfolio"
+        class="inline-flex items-center rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-brand-700"
+      >
+        Manage Portfolio →
+      </a>
+    </div>
+
+    <div class="mt-8">
+      <AdminPanel client:load />
+    </div>
+  </div>
+</AdminLayout>

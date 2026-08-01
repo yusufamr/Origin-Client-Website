@@ -1,0 +1,31 @@
+---
+// LocalBusiness structured data for the home page only.
+// TODO: replace phone, address, and social links with the client's real details.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'Origin UPVC',
+  description:
+    'Origin UPVC manufactures and installs premium UPVC windows, shower cabins, and roller shutters.',
+  image: new URL('/og-default.jpg', Astro.site).toString(),
+  url: Astro.site?.toString(),
+  telephone: '+000-000-000-000',
+  priceRange: '$$',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Street placeholder',
+    addressLocality: 'City placeholder',
+    addressCountry: 'Country placeholder',
+  },
+  makesOffer: [
+    { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'UPVC Windows' } },
+    { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Shower Cabins' } },
+    { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Roller Shutters' } },
+  ],
+  sameAs: [
+    // TODO: replace with client's real social media URLs
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

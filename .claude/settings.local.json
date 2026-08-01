@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm src/pages/index.astro)",
+      "Bash(mkdir -p src/pages/ar src/pages/en src/pages/products src/pages/ar/products src/pages/en/products)",
+      "Bash(npm run *)",
+      "Bash(tee /tmp/astro-dev.log)",
+      "Bash(curl -s -o /dev/null -w \"STATUS:%{http_code}\\\\n\" http://localhost:4321/)",
+      "Bash(curl -s -o /dev/null -w \"STATUS:%{http_code}\\\\n\" http://localhost:4321/ar/)",
+      "Bash(curl -s -o /dev/null -w \"STATUS:%{http_code}\\\\n\" http://localhost:4321/en/)",
+      "Bash(cat /tmp/astro-dev.log)",
+      "Read(//tmp/**)",
+      "Bash(timeout 15 npx astro dev --port 4321)",
+      "Bash(npx astro *)",
+      "Bash(curl -s http://localhost:4321/ar/)",
+      "Bash(curl -s http://localhost:4321/en/)",
+      "Bash(pkill -f \"dist/server/entry.mjs\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 15136 //F)",
+      "Bash(curl -s -X POST http://localhost:4321/api/submit-request -H \"Content-Type: application/json\" -d '{\"name\":\"Test User\",\"phone\":\"0501234567\",\"time\":\"morning\"}')",
+      "Bash(curl -sv http://localhost:4321/admin)",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"GET /api/admin/requests \\(no cookie\\): %{http_code}\\\\n\" http://localhost:4321/api/admin/requests)",
+      "Bash(curl -s -o /dev/null -w \"login wrong pw: %{http_code}\\\\n\" -X POST http://localhost:4321/api/admin/login -H \"Content-Type: application/json\" -d '{\"password\":\"wrong\"}')",
+      "Bash(curl -s -c /tmp/cookies.txt -o /dev/null -w \"login correct pw: %{http_code}\\\\n\" -X POST http://localhost:4321/api/admin/login -H \"Content-Type: application/json\" -d '{\"password\":\"testpass123\"}')",
+      "Bash(curl -s -b /tmp/cookies.txt http://localhost:4321/api/admin/requests)",
+      "Bash(curl -s -b /tmp/cookies.txt http://localhost:4321/api/portfolio/list)",
+      "Bash(curl -s -b /tmp/cookies.txt -X POST http://localhost:4321/api/portfolio/add -F 'image=@/tmp/test-upload.jpg;type=image/jpeg' -F descriptionAr=اختبار -F 'descriptionEn=Test item' -F date=2026-07-25)",
+      "Bash(curl -s -b /tmp/cookies.txt -X POST http://localhost:4321/api/portfolio/add -F 'image=@test-upload.jpg;type=image/jpeg' -F descriptionAr=اختبار -F 'descriptionEn=Test item' -F date=2026-07-25)",
+      "Bash(curl -s -b /tmp/cookies.txt -X POST http://localhost:4321/api/portfolio/add -H 'Origin: http://localhost:4321' -F 'image=@test-upload.jpg;type=image/jpeg' -F descriptionAr=اختبار -F 'descriptionEn=Test item' -F date=2026-07-25)",
+      "Bash(curl -s -b /tmp/cookies.txt -X POST http://localhost:4321/api/portfolio/delete -H 'Origin: http://localhost:4321' -H 'Content-Type: application/json' -d '{\"id\":\"1785011295549\"}')",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>console.log\\(JSON.parse\\(d\\).length + ' items'\\)\\)\")",
+      "Bash(curl -s http://localhost:4321/ar/products/windows/)",
+      "Bash(curl -s http://localhost:4321/en/portfolio/)"
+    ]
+  }
+}

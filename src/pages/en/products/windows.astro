@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProductPage from '../../../components/products/ProductPage.astro';
+import { getEntry } from 'astro:content';
+
+const entry = await getEntry('products', 'en/windows');
+---
+
+<BaseLayout title={entry!.data.title} description={entry!.data.metaDescription}>
+  <ProductPage slug="windows" />
+</BaseLayout>
