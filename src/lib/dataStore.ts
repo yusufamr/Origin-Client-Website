@@ -8,6 +8,8 @@ const ROOT = process.cwd();
 const REQUESTS_PATH = path.join(ROOT, 'src/data/requests.json');
 const PORTFOLIO_JSON_PATH = path.join(ROOT, 'src/content/portfolio/portfolio.json');
 const PORTFOLIO_IMAGES_DIR = path.join(ROOT, 'public/portfolio');
+const PRODUCTS_JSON_PATH = path.join(ROOT, 'src/content/products/products.json');
+const PRODUCTS_IMAGES_DIR = path.join(ROOT, 'public/products');
 
 export interface CallRequest {
   id: string;
@@ -24,6 +26,30 @@ export interface PortfolioItem {
   descriptionEn: string;
   descriptionAr: string;
   date: string;
+}
+
+export interface Product {
+  id: string;
+  slug: string;
+  titleEn: string;
+  titleAr: string;
+  taglineEn: string;
+  taglineAr: string;
+  articleEn: string;
+  articleAr: string;
+  videoUrl: string;
+  images: string[];
+  order: number;
+}
+
+export type ProductTextFields = Pick<
+  Product,
+  'titleEn' | 'titleAr' | 'taglineEn' | 'taglineAr' | 'articleEn' | 'articleAr' | 'videoUrl'
+>;
+
+interface ImageUpload {
+  buffer: Buffer;
+  ext: string;
 }
 
 async function readJson<T>(filePath: string, fallback: T): Promise<T> {
@@ -100,5 +126,129 @@ export async function deletePortfolioItem(id: string): Promise<boolean> {
     if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
   }
 
+  return true;
+}
+
+function slugify(title: string): string {
+  return (
+    title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') || 'product'
+  );
+}
+
+function uniqueSlug(base: string, existing: Product[]): string {
+  const baseSlug = slugify(base);
+  let slug = baseSlug;
+  let n = 2;
+  while (existing.some((p) => p.slug === slug)) {
+    slug = `${baseSlug}-${n++}`;
+  }
+  return slug;
+}
+
+async function unlinkPublicFile(publicPath: string): Promise<void> {
+  try {
+    await unlink(path.join(ROOT, 'public', publicPath.replace(/^\//, '')));
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
+  }
+}
+
+export async function getProducts(): Promise<Product[]> {
+  const items = await readJson<Product[]>(PRODUCTS_JSON_PATH, []);
+  return items.sort((a, b) => a.order - b.order);
+}
+
+export async function getProductBySlug(slug: string): Promise<Product | undefined> {
+  const items = await getProducts();
+  return items.find((p) => p.slug === slug);
+}
+
+export async function addProduct(fields: ProductTextFields, images: ImageUpload[]): Promise<Product> {
+  await mkdir(PRODUCTS_IMAGES_DIR, { recursive: true });
+  const items = await getProducts();
+  const id = Date.now().toString();
+  const slug = uniqueSlug(fields.titleEn, items);
+
+  const imagePaths: string[] = [];
+  for (const [i, image] of images.entries()) {
+    const filename = `${id}-${i}${image.ext}`;
+    await writeFile(path.join(PRODUCTS_IMAGES_DIR, filename), image.buffer);
+    imagePaths.push(`/products/${filename}`);
+  }
+
+  const order = items.length ? Math.max(...items.map((p) => p.order)) + 1 : 1;
+  const newProduct: Product = { id, slug, images: imagePaths, order, ...fields };
+
+  items.push(newProduct);
+  await writeJson(PRODUCTS_JSON_PATH, items);
+  return newProduct;
+}
+
+export async function updateProduct(
+  id: string,
+  fields: ProductTextFields,
+  newImages: ImageUpload[],
+  removeImagePaths: string[]
+): Promise<Product | null> {
+  const items = await getProducts();
+  const index = items.findIndex((p) => p.id === id);
+  if (index === -1) return null;
+
+  const product = items[index];
+  Object.assign(product, fields);
+
+  if (removeImagePaths.length) {
+    product.images = product.images.filter((img) => !removeImagePaths.includes(img));
+    for (const imgPath of removeImagePaths) {
+      await unlinkPublicFile(imgPath);
+    }
+  }
+
+  if (newImages.length) {
+    await mkdir(PRODUCTS_IMAGES_DIR, { recursive: true });
+    for (const [i, image] of newImages.entries()) {
+      const filename = `${id}-${Date.now()}-${i}${image.ext}`;
+      await writeFile(path.join(PRODUCTS_IMAGES_DIR, filename), image.buffer);
+      product.images.push(`/products/${filename}`);
+    }
+  }
+
+  items[index] = product;
+  await writeJson(PRODUCTS_JSON_PATH, items);
+  return product;
+}
+
+export async function deleteProduct(id: string): Promise<boolean> {
+  const items = await getProducts();
+  const index = items.findIndex((p) => p.id === id);
+  if (index === -1) return false;
+
+  const [removed] = items.splice(index, 1);
+  await writeJson(PRODUCTS_JSON_PATH, items);
+
+  for (const imgPath of removed.images) {
+    await unlinkPublicFile(imgPath);
+  }
+
+  return true;
+}
+
+export async function reorderProduct(id: string, direction: 'up' | 'down'): Promise<boolean> {
+  const items = await getProducts();
+  const index = items.findIndex((p) => p.id === id);
+  if (index === -1) return false;
+
+  const swapIndex = direction === 'up' ? index - 1 : index + 1;
+  if (swapIndex < 0 || swapIndex >= items.length) return false;
+
+  const currentOrder = items[index].order;
+  items[index].order = items[swapIndex].order;
+  items[swapIndex].order = currentOrder;
+
+  await writeJson(PRODUCTS_JSON_PATH, items);
   return true;
 }

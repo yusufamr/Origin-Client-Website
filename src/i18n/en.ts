@@ -13,11 +13,6 @@ export const en: Dictionary = {
     contact: 'Contact',
     requestCall: 'Request a Call',
   },
-  productNav: {
-    windows: 'UPVC Windows',
-    showerCabins: 'Shower Cabins',
-    shutters: 'Roller Shutters',
-  },
   hero: {
     title: 'UPVC Windows & Doors Built to Last a Lifetime',
     subtitle:
@@ -27,22 +22,8 @@ export const en: Dictionary = {
   services: {
     title: 'Our Products',
     subtitle: 'Precision-engineered UPVC solutions for every part of your home',
-    learnMore: 'Learn More',
-    windows: {
-      title: 'UPVC Windows',
-      description:
-        'Energy-efficient, weatherproof UPVC windows that keep noise and heat out while adding a sleek, modern look to any space.',
-    },
-    showerCabins: {
-      title: 'Shower Cabins',
-      description:
-        'Durable, water-resistant UPVC shower cabins designed for easy maintenance and a clean, contemporary bathroom finish.',
-    },
-    shutters: {
-      title: 'Roller Shutters',
-      description:
-        'Heavy-duty UPVC roller shutters that add security, light control, and insulation to homes and storefronts alike.',
-    },
+    learnMore: 'Products Explanation',
+    seeAll: 'See All Products',
   },
   whyUs: {
     title: 'Why Choose Origin UPVC',
@@ -83,6 +64,13 @@ export const en: Dictionary = {
     empty: 'Portfolio items will appear here soon.',
     dateLabel: 'Completed',
     viewImage: 'View project photo',
+  },
+  productsPage: {
+    title: 'Our Products',
+    description:
+      'Browse the full range of UPVC windows, shower cabins, and roller shutters manufactured and installed by Origin UPVC.',
+    intro: 'Explore our full catalog of UPVC products, each built for durability, insulation, and modern design.',
+    empty: 'Products will appear here soon.',
   },
   productCommon: {
     ctaTitle: 'Ready to Upgrade Your Home?',

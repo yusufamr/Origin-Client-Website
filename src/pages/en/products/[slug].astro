@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProductPage from '../../../components/products/ProductPage.astro';
+import { getProductBySlug } from '../../../lib/dataStore';
+
+const { slug } = Astro.params;
+const product = slug ? await getProductBySlug(slug) : undefined;
+
+if (!product) {
+  return Astro.redirect('/en/products/');
+}
+---
+
+<BaseLayout title={product.titleEn} description={product.taglineEn}>
+  <ProductPage product={product} lang="en" />
+</BaseLayout>

@@ -31,7 +31,14 @@
       "Bash(curl -s -b /tmp/cookies.txt -X POST http://localhost:4321/api/portfolio/delete -H 'Origin: http://localhost:4321' -H 'Content-Type: application/json' -d '{\"id\":\"1785011295549\"}')",
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>console.log\\(JSON.parse\\(d\\).length + ' items'\\)\\)\")",
       "Bash(curl -s http://localhost:4321/ar/products/windows/)",
-      "Bash(curl -s http://localhost:4321/en/portfolio/)"
+      "Bash(curl -s http://localhost:4321/en/portfolio/)",
+      "Bash(mkdir -p \"public/products\" && cp \"src/content/products/_images/\"*.jpg \"public/products/\" && ls \"public/products/\")",
+      "Bash(npm i *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:4321/products/windows-1.jpg)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:4321/api/products/list)"
+    ],
+    "additionalDirectories": [
+      "c:\\Work\\Origin-Client-Website\\src\\content\\products\\_images"
     ]
   }
 }

@@ -4,6 +4,7 @@ import Icon from './Icon.astro';
 import LanguageSwitcher from './LanguageSwitcher';
 import logo from '../assets/logo.png';
 import { getLangFromUrl, path, useTranslations } from '../i18n/utils';
+import { getProducts } from '../lib/dataStore';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -14,11 +15,11 @@ const navLinks = [
   { href: path('contact', lang), label: t.nav.contact },
 ];
 
-const productLinks = [
-  { href: path('products/windows', lang), label: t.productNav.windows },
-  { href: path('products/shower-cabins', lang), label: t.productNav.showerCabins },
-  { href: path('products/shutters', lang), label: t.productNav.shutters },
-];
+const products = await getProducts();
+const productLinks = products.map((product) => ({
+  href: path(`products/${product.slug}`, lang),
+  label: lang === 'ar' ? product.titleAr : product.titleEn,
+}));
 ---
 
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -43,6 +44,12 @@ const productLinks = [
               {link.label}
             </a>
           ))}
+          <a
+            href={path('products', lang)}
+            class="mt-1 block border-t border-slate-100 px-4 pt-2 text-sm font-semibold text-brand-700 hover:bg-brand-50"
+          >
+            {t.services.seeAll}
+          </a>
         </div>
       </details>
 

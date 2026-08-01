@@ -3,7 +3,7 @@ import ServiceCard from '../ServiceCard.astro';
 import WhyUsPoint from '../WhyUsPoint.astro';
 import JsonLd from '../JsonLd.astro';
 import { getLangFromUrl, path, useTranslations } from '../../i18n/utils';
-import { getPortfolioItems } from '../../lib/dataStore';
+import { getPortfolioItems, getProducts } from '../../lib/dataStore';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -12,6 +12,9 @@ const allPortfolioItems = await getPortfolioItems();
 const latestPortfolioItems = [...allPortfolioItems]
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   .slice(0, 3);
+
+const allProducts = await getProducts();
+const teaserProducts = allProducts.slice(0, 3);
 ---
 
 <JsonLd />
@@ -34,34 +37,29 @@ const latestPortfolioItems = [...allPortfolioItems]
 </section>
 
 <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20" aria-labelledby="services-heading">
-  <div class="mx-auto max-w-2xl text-center">
-    <h2 id="services-heading" class="text-3xl font-extrabold tracking-tight text-slate-900">{t.services.title}</h2>
-    <p class="mt-3 text-slate-600">{t.services.subtitle}</p>
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h2 id="services-heading" class="text-3xl font-extrabold tracking-tight text-slate-900">{t.services.title}</h2>
+      <p class="mt-3 max-w-xl text-slate-600">{t.services.subtitle}</p>
+    </div>
+    <a href={path('products', lang)} class="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800">
+      {t.services.seeAll}
+    </a>
   </div>
 
-  <div class="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-    <ServiceCard
-      icon="windows"
-      title={t.services.windows.title}
-      description={t.services.windows.description}
-      href={path('products/windows', lang)}
-      learnMoreLabel={t.services.learnMore}
-    />
-    <ServiceCard
-      icon="shower"
-      title={t.services.showerCabins.title}
-      description={t.services.showerCabins.description}
-      href={path('products/shower-cabins', lang)}
-      learnMoreLabel={t.services.learnMore}
-    />
-    <ServiceCard
-      icon="shutters"
-      title={t.services.shutters.title}
-      description={t.services.shutters.description}
-      href={path('products/shutters', lang)}
-      learnMoreLabel={t.services.learnMore}
-    />
-  </div>
+  {teaserProducts.length > 0 && (
+    <div class="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+      {teaserProducts.map((product) => (
+        <ServiceCard
+          icon="box"
+          title={lang === 'ar' ? product.titleAr : product.titleEn}
+          description={lang === 'ar' ? product.taglineAr : product.taglineEn}
+          href={path(`products/${product.slug}`, lang)}
+          learnMoreLabel={t.services.learnMore}
+        />
+      ))}
+    </div>
+  )}
 </section>
 
 <section class="bg-slate-50 py-16 md:py-20" aria-labelledby="why-us-heading">

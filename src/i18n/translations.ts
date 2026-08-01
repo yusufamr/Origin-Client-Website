@@ -13,11 +13,6 @@ export interface Dictionary {
     contact: string;
     requestCall: string;
   };
-  productNav: {
-    windows: string;
-    showerCabins: string;
-    shutters: string;
-  };
   hero: {
     title: string;
     subtitle: string;
@@ -27,9 +22,7 @@ export interface Dictionary {
     title: string;
     subtitle: string;
     learnMore: string;
-    windows: { title: string; description: string };
-    showerCabins: { title: string; description: string };
-    shutters: { title: string; description: string };
+    seeAll: string;
   };
   whyUs: {
     title: string;
@@ -48,6 +41,12 @@ export interface Dictionary {
     empty: string;
     dateLabel: string;
     viewImage: string;
+  };
+  productsPage: {
+    title: string;
+    description: string;
+    intro: string;
+    empty: string;
   };
   productCommon: {
     ctaTitle: string;

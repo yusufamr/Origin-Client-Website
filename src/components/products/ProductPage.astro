@@ -1,28 +1,19 @@
 ---
-import { getEntry, render } from 'astro:content';
-import { Image } from 'astro:assets';
-import Icon, { type IconName } from '../Icon.astro';
-import { getLangFromUrl, path, useTranslations } from '../../i18n/utils';
+import Icon from '../Icon.astro';
+import { path, useTranslations, type Lang } from '../../i18n/utils';
+import type { Product } from '../../lib/dataStore';
 
 interface Props {
-  slug: 'windows' | 'shower-cabins' | 'shutters';
+  product: Product;
+  lang: Lang;
 }
 
-const { slug } = Astro.props;
-const lang = getLangFromUrl(Astro.url);
+const { product, lang } = Astro.props;
 const t = useTranslations(lang);
 
-const entry = await getEntry('products', `${lang}/${slug}`);
-if (!entry) {
-  throw new Error(`Missing product content for ${lang}/${slug}`);
-}
-const { Content } = await render(entry);
-
-const iconMap: Record<Props['slug'], IconName> = {
-  windows: 'windows',
-  'shower-cabins': 'shower',
-  shutters: 'shutters',
-};
+const title = lang === 'ar' ? product.titleAr : product.titleEn;
+const tagline = lang === 'ar' ? product.taglineAr : product.taglineEn;
+const article = lang === 'ar' ? product.articleAr : product.articleEn;
 
 function getYoutubeEmbedUrl(watchUrl: string): string {
   try {
@@ -38,51 +29,55 @@ function getYoutubeEmbedUrl(watchUrl: string): string {
 <section class="bg-gradient-to-b from-brand-800 to-brand-950 text-white">
   <div class="mx-auto flex max-w-4xl flex-col items-start gap-4 px-4 py-16 sm:px-6 md:py-20">
     <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
-      <Icon name={iconMap[slug]} class="h-6 w-6" />
+      <Icon name="box" class="h-6 w-6" />
     </div>
-    <h1 class="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{entry.data.title}</h1>
-    <p class="max-w-2xl text-lg leading-relaxed text-brand-100">{entry.data.tagline}</p>
+    <h1 class="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{title}</h1>
+    <p class="max-w-2xl text-lg leading-relaxed text-brand-100">{tagline}</p>
   </div>
 </section>
 
 <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 md:py-16">
-  <div class="prose prose-slate max-w-none prose-headings:font-extrabold prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-a:text-brand-700">
-    <Content />
-  </div>
+  <div class="whitespace-pre-line text-base leading-relaxed text-slate-700">{article}</div>
 </article>
 
-<section class="bg-slate-50 py-14 md:py-16" aria-labelledby="photo-examples-heading">
-  <div class="mx-auto max-w-5xl px-4 sm:px-6">
-    <h2 id="photo-examples-heading" class="text-2xl font-extrabold tracking-tight text-slate-900">
-      {t.productCommon.photoExamples}
-    </h2>
-    <!-- TODO: replace with client asset -->
-    <div class="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-      {entry.data.images.map((image) => (
-        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <Image src={image.src} alt={image.alt} class="h-full w-full object-cover" />
+{
+  product.images.length > 0 && (
+    <section class="bg-slate-50 py-14 md:py-16" aria-labelledby="photo-examples-heading">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6">
+        <h2 id="photo-examples-heading" class="text-2xl font-extrabold tracking-tight text-slate-900">
+          {t.productCommon.photoExamples}
+        </h2>
+        <div class="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          {product.images.map((image) => (
+            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <img src={image} alt={title} class="h-full w-full object-cover" loading="lazy" decoding="async" />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  </div>
-</section>
+      </div>
+    </section>
+  )
+}
 
-<section class="mx-auto max-w-4xl px-4 py-14 sm:px-6 md:py-16" aria-labelledby="video-heading">
-  <h2 id="video-heading" class="text-2xl font-extrabold tracking-tight text-slate-900">
-    {t.productCommon.watchVideo}
-  </h2>
-  <!-- TODO: replace with client asset (real product demonstration video) -->
-  <div class="mt-6 aspect-video overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-sm">
-    <iframe
-      class="h-full w-full"
-      src={getYoutubeEmbedUrl(entry.data.videoUrl)}
-      title={t.productCommon.videoLabel}
-      loading="lazy"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen
-    ></iframe>
-  </div>
-</section>
+{
+  product.videoUrl && (
+    <section class="mx-auto max-w-4xl px-4 py-14 sm:px-6 md:py-16" aria-labelledby="video-heading">
+      <h2 id="video-heading" class="text-2xl font-extrabold tracking-tight text-slate-900">
+        {t.productCommon.watchVideo}
+      </h2>
+      <div class="mt-6 aspect-video overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-sm">
+        <iframe
+          class="h-full w-full"
+          src={getYoutubeEmbedUrl(product.videoUrl)}
+          title={t.productCommon.videoLabel}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        />
+      </div>
+    </section>
+  )
+}
 
 <section class="bg-brand-700 text-white">
   <div class="mx-auto flex max-w-4xl flex-col items-start gap-4 px-4 py-14 sm:px-6 md:py-16">

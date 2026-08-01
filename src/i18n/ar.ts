@@ -13,11 +13,6 @@ export const ar: Dictionary = {
     contact: 'تواصل معنا',
     requestCall: 'اطلب اتصالاً',
   },
-  productNav: {
-    windows: 'نوافذ UPVC',
-    showerCabins: 'كبائن الاستحمام',
-    shutters: 'الرولر شتر',
-  },
   hero: {
     title: 'نوافذ UPVC تدوم معك لعمر طويل',
     subtitle:
@@ -27,22 +22,8 @@ export const ar: Dictionary = {
   services: {
     title: 'منتجاتنا',
     subtitle: 'حلول UPVC دقيقة الصناعة لكل جزء من منزلك',
-    learnMore: 'اعرف المزيد',
-    windows: {
-      title: 'نوافذ UPVC',
-      description:
-        'نوافذ UPVC موفرة للطاقة ومقاومة لعوامل الطقس، تمنع الضوضاء والحرارة وتمنح مساحتك مظهراً عصرياً أنيقاً.',
-    },
-    showerCabins: {
-      title: 'كبائن الاستحمام',
-      description:
-        'كبائن استحمام مصنوعة من UPVC مقاومة للماء وسهلة الصيانة، تمنح حمامك لمسة نظيفة وعصرية.',
-    },
-    shutters: {
-      title: 'الرولر شتر',
-      description:
-        'رولر شتر متين من UPVC يضيف الأمان والتحكم في الإضاءة والعزل الحراري للمنازل والمحلات التجارية.',
-    },
+    learnMore: 'شرح المنتج',
+    seeAll: 'مشاهدة كل المنتجات',
   },
   whyUs: {
     title: 'لماذا تختار أورجين يو بي في سي',
@@ -81,6 +62,12 @@ export const ar: Dictionary = {
     empty: 'سيتم عرض أعمالنا هنا قريباً.',
     dateLabel: 'تاريخ الإنجاز',
     viewImage: 'عرض صورة المشروع',
+  },
+  productsPage: {
+    title: 'منتجاتنا',
+    description: 'تصفح كل منتجات نوافذ UPVC وكبائن الاستحمام والرولر شتر التي تصنّعها وتركّبها أورجين يو بي في سي.',
+    intro: 'استكشف كتالوج منتجاتنا الكامل من UPVC، المصممة للمتانة والعزل والتصميم العصري.',
+    empty: 'سيتم عرض منتجاتنا هنا قريباً.',
   },
   productCommon: {
     ctaTitle: 'هل أنت مستعد لتطوير منزلك؟',

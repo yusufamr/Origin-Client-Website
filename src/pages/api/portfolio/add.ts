@@ -1,13 +1,7 @@
 import type { APIRoute } from 'astro';
 import { isAuthorized } from '../../../lib/adminAuth';
 import { addPortfolioItem } from '../../../lib/dataStore';
-
-const MAX_SIZE_BYTES = 5 * 1024 * 1024;
-const ALLOWED_TYPES: Record<string, string> = {
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-};
+import { ALLOWED_IMAGE_TYPES as ALLOWED_TYPES, MAX_IMAGE_SIZE_BYTES as MAX_SIZE_BYTES } from '../../../lib/uploadValidation';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   if (!isAuthorized(request, cookies)) {
