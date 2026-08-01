@@ -15,13 +15,17 @@ const quickLinks = [
   { href: path('contact', lang), label: t.nav.contact },
 ];
 
-// TODO: replace with client's real social media URLs
+const WHATSAPP_NUMBER = '+20 127 368 3473';
+const WHATSAPP_LINK = 'https://wa.me/201273683473';
+const PHONE_LINK = 'tel:+201273683473';
+const MAPS_LINK = 'https://maps.app.goo.gl/SziKtrcp2LiKLaMp9';
+
 const socialLinks = [
-  { name: 'instagram' as const, label: t.social.instagram, href: '#' },
-  { name: 'tiktok' as const, label: t.social.tiktok, href: '#' },
-  { name: 'facebook' as const, label: t.social.facebook, href: '#' },
-  { name: 'youtube' as const, label: t.social.youtube, href: '#' },
-  { name: 'whatsapp' as const, label: t.social.whatsapp, href: '#' },
+  { name: 'instagram' as const, label: t.social.instagram, href: 'https://www.instagram.com/originupvc?igsh=M283YTZlN2luYWlm' },
+  { name: 'tiktok' as const, label: t.social.tiktok, href: 'https://www.tiktok.com/@origin.upvc.for.w?_r=1&_t=ZS-98WKUjvqZqW' },
+  { name: 'facebook' as const, label: t.social.facebook, href: 'https://www.facebook.com/share/1G5k9S5XuD/?mibextid=wwXIfr' },
+  { name: 'youtube' as const, label: t.social.youtube, href: 'https://www.youtube.com/@OriginUPVC' },
+  { name: 'whatsapp' as const, label: t.social.whatsapp, href: WHATSAPP_LINK },
 ];
 ---
 
@@ -36,9 +40,10 @@ const socialLinks = [
           <a
             href={social.href}
             aria-label={social.label}
+            target="_blank"
+            rel="noopener noreferrer"
             class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700"
           >
-            <!-- TODO: replace with client asset -->
             <Icon name={social.name} class="h-4 w-4" />
           </a>
         ))}
@@ -59,20 +64,25 @@ const socialLinks = [
     <div>
       <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">{t.footer.contactUs}</p>
       <ul class="mt-4 space-y-3 text-sm text-slate-600">
-        <li class="flex items-center gap-2">
-          <Icon name="phone" class="h-4 w-4 shrink-0 text-brand-600" />
-          <!-- TODO: replace with client asset -->
-          <span>{t.footer.phone}</span>
-        </li>
+        {t.footer.phone && (
+          <li class="flex items-center gap-2">
+            <Icon name="phone" class="h-4 w-4 shrink-0 text-brand-600" />
+            <a href={PHONE_LINK} class="hover:text-brand-700">
+              <bdi dir="ltr">{t.footer.phone}</bdi>
+            </a>
+          </li>
+        )}
         <li class="flex items-center gap-2">
           <Icon name="whatsapp" class="h-4 w-4 shrink-0 text-brand-600" />
-          <!-- TODO: replace with client asset -->
-          <a href="#" class="hover:text-brand-700">{t.footer.whatsapp}: {t.footer.phone}</a>
+          <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" class="hover:text-brand-700">
+            {t.footer.whatsapp}: <bdi dir="ltr">{WHATSAPP_NUMBER}</bdi>
+          </a>
         </li>
         <li class="flex items-center gap-2">
           <Icon name="map-pin" class="h-4 w-4 shrink-0 text-brand-600" />
-          <!-- TODO: replace with client asset -->
-          <span>{t.footer.address}</span>
+          <a href={MAPS_LINK} target="_blank" rel="noopener noreferrer" class="hover:text-brand-700">
+            {t.footer.address}
+          </a>
         </li>
       </ul>
     </div>

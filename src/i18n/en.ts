@@ -110,8 +110,8 @@ export const en: Dictionary = {
     followUs: 'Follow Us',
     contactUs: 'Contact',
     whatsapp: 'WhatsApp',
-    phone: '+000 000 000 000',
-    address: 'Your City, Your Country',
+    phone: '+20 127 368 3473',
+    address: 'Badr, Cairo',
     copyright: 'Origin UPVC. All rights reserved.',
   },
   social: {

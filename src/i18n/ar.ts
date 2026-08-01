@@ -106,8 +106,8 @@ export const ar: Dictionary = {
     followUs: 'تابعنا',
     contactUs: 'تواصل معنا',
     whatsapp: 'واتساب',
-    phone: '+000 000 000 000',
-    address: 'مدينتك، بلدك',
+    phone: '+20 127 368 3473',
+    address: 'بدر القاهرة',
     copyright: 'أورجين يو بي في سي. جميع الحقوق محفوظة.',
   },
   social: {
