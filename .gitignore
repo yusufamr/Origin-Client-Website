@@ -34,3 +34,7 @@ public/products/
 
 # Passenger restart marker
 tmp/
+
+# deploy staging folders (see .github/workflows/deploy.yml)
+.deploy/
+dist.old/

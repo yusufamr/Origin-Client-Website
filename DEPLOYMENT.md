@@ -222,9 +222,13 @@ it doesn't wipe these:
 - **Git-pull-based deploys:** deploy by `git pull` + `npm run build` inside
   the existing project directory, rather than deleting and re-cloning. Since
   these files are git-ignored, a `git pull` won't touch them.
-- **Bluehost (cPanel Node.js App):** `.github/workflows/deploy.yml` deploys on
-  every push to `main` over SSH (secrets: `SSH_HOST`, `SSH_USER`, `SSH_KEY`,
-  optional `SSH_PORT`). The app's startup file is `app.js` (cPanel Application Manager / Passenger).
+- **Bluehost (cPanel Application Manager / Passenger):**
+  `.github/workflows/deploy.yml` deploys on every push to `main` (secrets:
+  `SSH_HOST`, `SSH_USER`, `SSH_KEY`, optional `SSH_PORT`). It builds on
+  GitHub's runner — shared hosting's thread limits crash `astro build` — then
+  uploads `dist/`, runs `npm ci` on the server and restarts Passenger. Node 22
+  is installed per-user with nvm (`~/.nvm`); the app's startup file is
+  `app.js`, and `.htaccess` needs `PassengerNodejs <path to nvm node>`.
 - **Docker:** mount them as volumes (see the Docker example above) so they
   survive `docker build`/container recreation.
 - **Any setup:** back them up periodically:

@@ -9,7 +9,30 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/ssh-action@v1
+      # Build here, not on the server: Bluehost shared hosting limits threads,
+      # which crashes Astro's (Rust-based) build tooling.
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Upload build to server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: dist
+          target: origin-site/.deploy
+
+      - name: Update code, install runtime deps, swap build, restart
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -22,10 +45,9 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             . "$NVM_DIR/nvm.sh"
             nvm use 22
-            node -v
             cd ~/origin-site
             git fetch origin main
-            git reset --hard origin/main
+            git reset --hard ${{ github.sha }}
             # live data files are git-ignored, so the reset above never touches
             # them; this only fills in files that don't exist yet
             cp -rn seed/. .
@@ -33,5 +55,8 @@ jobs:
             # parallelism low, and retry (each attempt warms the npm cache)
             ulimit -n "$(ulimit -Hn)" || true
             npm ci --maxsockets=2 --no-audit --no-fund || npm ci --maxsockets=2 --no-audit --no-fund || npm ci --maxsockets=2 --no-audit --no-fund
-            npm run build
+            rm -rf dist.old
+            if [ -d dist ]; then mv dist dist.old; fi
+            mv .deploy/dist dist
+            rm -rf .deploy dist.old
             mkdir -p tmp && touch tmp/restart.txt
