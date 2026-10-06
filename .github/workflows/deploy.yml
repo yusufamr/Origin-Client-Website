@@ -29,6 +29,9 @@ jobs:
             # live data files are git-ignored, so the reset above never touches
             # them; this only fills in files that don't exist yet
             cp -rn seed/. .
-            npm ci
+            # shared hosting caps open files; raise to the hard limit, keep npm
+            # parallelism low, and retry (each attempt warms the npm cache)
+            ulimit -n "$(ulimit -Hn)" || true
+            npm ci --maxsockets=2 --no-audit --no-fund || npm ci --maxsockets=2 --no-audit --no-fund || npm ci --maxsockets=2 --no-audit --no-fund
             npm run build
             mkdir -p tmp && touch tmp/restart.txt
