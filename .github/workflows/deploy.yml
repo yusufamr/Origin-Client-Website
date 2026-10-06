@@ -18,7 +18,11 @@ jobs:
           command_timeout: 20m
           script: |
             set -e
-            source ~/nodevenv/origin-site/22/bin/activate
+            # Node is installed per-user with nvm (the host provides none)
+            export NVM_DIR="$HOME/.nvm"
+            . "$NVM_DIR/nvm.sh"
+            nvm use 22
+            node -v
             cd ~/origin-site
             git fetch origin main
             git reset --hard origin/main

@@ -224,7 +224,7 @@ it doesn't wipe these:
   these files are git-ignored, a `git pull` won't touch them.
 - **Bluehost (cPanel Node.js App):** `.github/workflows/deploy.yml` deploys on
   every push to `main` over SSH (secrets: `SSH_HOST`, `SSH_USER`, `SSH_KEY`,
-  optional `SSH_PORT`). The app's startup file is `app.cjs`.
+  optional `SSH_PORT`). The app's startup file is `app.js` (cPanel Application Manager / Passenger).
 - **Docker:** mount them as volumes (see the Docker example above) so they
   survive `docker build`/container recreation.
 - **Any setup:** back them up periodically:
