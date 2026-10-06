@@ -1,0 +1,30 @@
+name: Deploy to Bluehost
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          command_timeout: 20m
+          script: |
+            set -e
+            source ~/nodevenv/origin-site/22/bin/activate
+            cd ~/origin-site
+            git fetch origin main
+            git reset --hard origin/main
+            # live data files are git-ignored, so the reset above never touches
+            # them; this only fills in files that don't exist yet
+            cp -rn seed/. .
+            npm ci
+            npm run build
+            mkdir -p tmp && touch tmp/restart.txt

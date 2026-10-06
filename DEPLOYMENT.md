@@ -207,22 +207,31 @@ Caddy handles TLS certificates automatically — no certbot needed.
 
 ## 6. Protect your data across redeploys
 
-`src/data/requests.json`, `src/content/portfolio/portfolio.json`, and
-`public/portfolio/*` are written to at runtime and are **not part of your
-git history or build output** in the usual sense — they live on the
-server's disk. Whatever your redeploy process is, make sure it doesn't wipe
-these:
+These are written to at runtime and are **git-ignored** — they live only on
+the server's disk:
+
+- `src/data/requests.json`
+- `src/content/portfolio/portfolio.json`, `public/portfolio/*`
+- `src/content/products/products.json`, `public/products/*`
+
+`seed/` holds the starting content with the same folder layout. After a fresh
+clone, run `cp -rn seed/. .` to copy in any missing files (`-n` never
+overwrites existing live data). Whatever your redeploy process is, make sure
+it doesn't wipe these:
 
 - **Git-pull-based deploys:** deploy by `git pull` + `npm run build` inside
-  the existing project directory, rather than deleting and re-cloning. These
-  files aren't tracked by git (see `.gitignore`), so a `git pull` won't
-  touch them.
+  the existing project directory, rather than deleting and re-cloning. Since
+  these files are git-ignored, a `git pull` won't touch them.
+- **Bluehost (cPanel Node.js App):** `.github/workflows/deploy.yml` deploys on
+  every push to `main` over SSH (secrets: `SSH_HOST`, `SSH_USER`, `SSH_KEY`,
+  optional `SSH_PORT`). The app's startup file is `app.cjs`.
 - **Docker:** mount them as volumes (see the Docker example above) so they
   survive `docker build`/container recreation.
 - **Any setup:** back them up periodically:
   ```sh
   cp src/data/requests.json backups/requests-$(date +%F).json
   cp src/content/portfolio/portfolio.json backups/portfolio-$(date +%F).json
+  cp src/content/products/products.json backups/products-$(date +%F).json
   ```
 
 ---

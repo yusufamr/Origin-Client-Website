@@ -22,3 +22,15 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# runtime data written by the live server (admin panel, contact form, uploads).
+# Never tracked so deploys can't overwrite it; fresh installs are populated
+# from seed/ (see DEPLOYMENT.md).
+src/data/requests.json
+src/content/portfolio/portfolio.json
+src/content/products/products.json
+public/portfolio/
+public/products/
+
+# Passenger restart marker
+tmp/
