@@ -13,8 +13,16 @@
   --color-brand-900: #1f353d;
   --color-brand-950: #10202a;
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-arabic: "Tajawal", "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Orange from the logo — used for primary calls to action (always with dark text). */
+  --color-accent-300: #f8c27a;
+  --color-accent-400: #f6a93b;
+  --color-accent-500: #f29a1f;
+  --color-accent-600: #d9820a;
+
+  --color-surface: #f4f7f8;
+
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: "Tajawal", "Manrope", ui-sans-serif, system-ui, sans-serif;
 }
 
 html[dir="rtl"] body {

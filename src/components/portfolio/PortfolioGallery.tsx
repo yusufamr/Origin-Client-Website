@@ -81,16 +81,16 @@ export default function PortfolioGallery({ items, lang, dateLabel, viewImageLabe
 
   return (
     <>
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item, index) => (
           <button
             type="button"
             key={item.id}
             onClick={() => open(index)}
-            className="group relative block overflow-hidden rounded-2xl border border-slate-200 bg-white text-start shadow-sm transition hover:shadow-md"
+            className="group relative block overflow-hidden rounded-3xl border border-brand-100 bg-white text-start transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-950/10"
             aria-label={viewImageLabel}
           >
-            <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+            <div className="relative aspect-[4/3] overflow-hidden bg-brand-100">
               <img
                 src={item.images[0]}
                 alt={description(item, lang)}
@@ -98,17 +98,17 @@ export default function PortfolioGallery({ items, lang, dateLabel, viewImageLabe
                 height={800}
                 loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
               />
               {item.images.length > 1 && (
-                <span className="absolute end-2 top-2 rounded-full bg-slate-950/70 px-2 py-0.5 text-xs font-semibold text-white">
+                <span className="absolute end-2 top-2 rounded-full bg-brand-950/75 px-2.5 py-1 text-xs font-semibold text-white">
                   1 / {item.images.length}
                 </span>
               )}
             </div>
-            <div className="p-4">
-              <p className="text-sm text-slate-700">{description(item, lang)}</p>
-              <p className="mt-1 text-xs text-slate-400">
+            <div className="p-5">
+              <p className="text-[15px] font-medium text-brand-950">{description(item, lang)}</p>
+              <p className="mt-1.5 text-xs text-brand-700">
                 {dateLabel}: {formatDate(item.date, lang)}
               </p>
             </div>
@@ -118,7 +118,7 @@ export default function PortfolioGallery({ items, lang, dateLabel, viewImageLabe
 
       {activeProject && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-brand-950/95 p-4"
           role="dialog"
           aria-modal="true"
           onClick={close}

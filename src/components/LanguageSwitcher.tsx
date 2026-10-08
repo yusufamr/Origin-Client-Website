@@ -12,7 +12,7 @@ export default function LanguageSwitcher({ currentLang, currentPath }: Props) {
   return (
     <a
       href={href}
-      className="inline-flex items-center rounded-full border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-brand-600 hover:text-brand-700"
+      className="inline-flex items-center rounded-lg border border-brand-200 px-3 py-1.5 text-sm font-semibold text-brand-900 transition hover:border-brand-500 hover:text-brand-600"
       hrefLang={targetLang}
     >
       {languages[targetLang]}

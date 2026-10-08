@@ -1,11 +1,13 @@
 ---
 import { Image } from 'astro:assets';
 import ServiceCard from '../ServiceCard.astro';
-import WhyUsPoint from '../WhyUsPoint.astro';
+import CallbackSection from '../CallbackSection.astro';
+import Icon from '../Icon.astro';
 import JsonLd from '../JsonLd.astro';
 import heroWindow from '../../assets/hero-window.jpg';
 import { getLangFromUrl, path, useTranslations } from '../../i18n/utils';
 import { getPortfolioItems, getProducts } from '../../lib/dataStore';
+import { SOCIAL_LINKS, WHATSAPP_LINK, productIcon } from '../../lib/site';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -17,6 +19,9 @@ const latestPortfolioItems = [...allPortfolioItems]
 
 const allProducts = await getProducts();
 const teaserProducts = allProducts.slice(0, 3);
+
+// WhatsApp already has its own button in the hero and footer.
+const followLinks = SOCIAL_LINKS.filter((social) => social.name !== 'whatsapp');
 ---
 
 <JsonLd />
@@ -29,101 +34,153 @@ const teaserProducts = allProducts.slice(0, 3);
     sizes="100vw"
     loading="eager"
     fetchpriority="high"
-    class="absolute inset-0 h-full w-full object-cover object-left"
+    class="absolute inset-0 h-full w-full object-cover"
   />
-  <div class="absolute inset-0 bg-gradient-to-b from-brand-950/90 via-brand-950/85 to-brand-950/95" />
+  <div class="absolute inset-0 bg-brand-950/75" />
 
-  <div class="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 sm:px-6 md:py-28">
-    <h1 class="max-w-2xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-      {t.hero.title}
-    </h1>
-    <p class="max-w-xl text-lg leading-relaxed text-brand-100">
-      {t.hero.subtitle}
-    </p>
-    <a
-      href={path('contact', lang)}
-      class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-bold text-brand-800 shadow-lg transition hover:bg-brand-50"
-    >
-      {t.hero.cta}
-    </a>
+  <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="flex max-w-3xl flex-col items-start gap-6 pb-16 pt-20 md:pb-20 md:pt-28">
+      <h1 class="text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
+        {t.hero.title}
+      </h1>
+      <p class="max-w-2xl text-lg leading-relaxed text-brand-100">
+        {t.hero.subtitle}
+      </p>
+      <div class="flex flex-wrap gap-3 pt-2">
+        <a
+          href={path('contact', lang)}
+          class="inline-flex items-center rounded-xl bg-accent-500 px-7 py-4 text-base font-extrabold text-brand-950 transition hover:bg-accent-400"
+        >
+          {t.hero.cta}
+        </a>
+        <a
+          href={WHATSAPP_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-xl border border-white/35 bg-white/10 px-6 py-4 text-base font-bold text-white transition hover:bg-white/20"
+        >
+          <Icon name="whatsapp" class="h-5 w-5" />
+          {t.hero.whatsappCta}
+        </a>
+      </div>
+    </div>
+
+    <ul class="mb-6 grid gap-px overflow-hidden rounded-2xl bg-white/15 sm:grid-cols-2 lg:grid-cols-4" aria-label={t.whyUs.title}>
+      {t.whyUs.points.map((point) => (
+        <li class="flex gap-3 bg-brand-900/90 p-5">
+          <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-500 text-brand-950">
+            <Icon name="check" class="h-4 w-4" />
+          </span>
+          <div>
+            <p class="font-extrabold">{point.title}</p>
+            <p class="mt-1 text-sm leading-relaxed text-brand-200">{point.description}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
-<section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20" aria-labelledby="services-heading">
-  <div class="flex flex-wrap items-end justify-between gap-4">
-    <div>
-      <h2 id="services-heading" class="text-3xl font-extrabold tracking-tight text-slate-900">{t.services.title}</h2>
-      <p class="mt-3 max-w-xl text-slate-600">{t.services.subtitle}</p>
-    </div>
-    <a href={path('products', lang)} class="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800">
-      {t.services.seeAll}
-    </a>
+<section class="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-24" aria-labelledby="services-heading">
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="text-sm font-extrabold uppercase tracking-widest text-brand-600">{t.services.title}</p>
+    <h2 id="services-heading" class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">{t.services.subtitle}</h2>
   </div>
 
   {teaserProducts.length > 0 && (
-    <div class="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {teaserProducts.map((product) => (
         <ServiceCard
-          icon="box"
+          icon={productIcon(product.slug)}
           title={lang === 'ar' ? product.titleAr : product.titleEn}
           description={lang === 'ar' ? product.taglineAr : product.taglineEn}
           href={path(`products/${product.slug}`, lang)}
           learnMoreLabel={t.services.learnMore}
+          image={product.images[0]}
         />
       ))}
     </div>
   )}
-</section>
 
-<section class="bg-slate-50 py-16 md:py-20" aria-labelledby="why-us-heading">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6">
-    <div class="mx-auto max-w-2xl text-center">
-      <h2 id="why-us-heading" class="text-3xl font-extrabold tracking-tight text-slate-900">{t.whyUs.title}</h2>
-      <p class="mt-3 text-slate-600">{t.whyUs.subtitle}</p>
-    </div>
-
-    <div class="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2">
-      {t.whyUs.points.map((point) => (
-        <WhyUsPoint title={point.title} description={point.description} />
-      ))}
-    </div>
+  <div class="mt-10 text-center">
+    <a
+      href={path('products', lang)}
+      class="inline-flex items-center gap-1 rounded-xl border border-brand-200 bg-white px-6 py-3 text-sm font-bold text-brand-800 transition hover:border-brand-500"
+    >
+      {t.services.seeAll}
+      <Icon name="chevron-right" class="h-4 w-4 rtl:rotate-180" />
+    </a>
   </div>
 </section>
 
-<section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20" aria-labelledby="portfolio-heading">
+<section class="border-y border-brand-100 bg-white" aria-labelledby="process-heading">
+  <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-24">
+    <h2 id="process-heading" class="text-3xl font-extrabold tracking-tight sm:text-4xl">{t.process.title}</h2>
+    <ol class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      {t.process.steps.map((step, index) => (
+        <li class="flex flex-col gap-3">
+          <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-950 text-base font-extrabold text-white">
+            {index + 1}
+          </span>
+          <h3 class="text-lg font-extrabold">{step.title}</h3>
+          <p class="text-[15px] leading-relaxed text-brand-800/80">{step.description}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-24" aria-labelledby="portfolio-heading">
   <div class="flex flex-wrap items-end justify-between gap-4">
     <div>
-      <h2 id="portfolio-heading" class="text-3xl font-extrabold tracking-tight text-slate-900">
+      <h2 id="portfolio-heading" class="text-3xl font-extrabold tracking-tight sm:text-4xl">
         {t.portfolioTeaser.title}
       </h2>
-      <p class="mt-3 max-w-xl text-slate-600">{t.portfolioTeaser.subtitle}</p>
+      <p class="mt-3 max-w-xl text-brand-800/80">{t.portfolioTeaser.subtitle}</p>
     </div>
-    <a href={path('portfolio', lang)} class="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800">
+    <a href={path('portfolio', lang)} class="inline-flex items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-800">
       {t.portfolioTeaser.seeAll}
+      <Icon name="chevron-right" class="h-4 w-4 rtl:rotate-180" />
     </a>
   </div>
 
   {latestPortfolioItems.length > 0 && (
-    <div class="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {latestPortfolioItems.map((item) => (
-        <a
-          href={path('portfolio', lang)}
-          class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
-        >
-          <div class="aspect-[4/3] overflow-hidden bg-slate-100">
+        <a href={path('portfolio', lang)} class="group block">
+          <div class="aspect-[4/3] overflow-hidden rounded-3xl bg-brand-100">
             <img
               src={item.images[0]}
               alt={lang === 'ar' ? item.descriptionAr : item.descriptionEn}
               width="1200"
-              height="800"
+              height="900"
               loading="lazy"
               decoding="async"
-              class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+              class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
           </div>
-          <p class="p-4 text-sm text-slate-700">{lang === 'ar' ? item.descriptionAr : item.descriptionEn}</p>
+          <p class="mt-3 text-sm text-brand-800/80">{lang === 'ar' ? item.descriptionAr : item.descriptionEn}</p>
         </a>
       ))}
     </div>
   )}
+
+  <div class="mt-10 flex flex-wrap items-center gap-4 rounded-2xl border border-brand-100 bg-white px-6 py-5">
+    <p class="font-extrabold">{t.portfolioTeaser.followUs}</p>
+    <div class="flex flex-wrap gap-2">
+      {followLinks.map((social) => (
+        <a
+          href={social.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-xl border border-brand-100 px-4 py-2.5 text-sm font-semibold text-brand-900 transition hover:border-brand-500 hover:text-brand-600"
+        >
+          <Icon name={social.name} class="h-4 w-4" />
+          {t.social[social.name]}
+        </a>
+      ))}
+    </div>
+  </div>
 </section>
+
+<CallbackSection lang={lang} />

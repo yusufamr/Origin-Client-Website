@@ -17,6 +17,7 @@ export const en: Dictionary = {
     subtitle:
       'Origin UPVC delivers high-performance UPVC windows, shower cabins, and roller shutters engineered for insulation, security, and lasting quality — precision manufactured and professionally installed.',
     cta: 'Request a Free Call',
+    whatsappCta: 'Chat on WhatsApp',
   },
   services: {
     title: 'Our Products',
@@ -50,10 +51,20 @@ export const en: Dictionary = {
       },
     ],
   },
+  process: {
+    title: 'How It Works',
+    steps: [
+      { title: 'Request a call', description: 'Leave your number and a good time to reach you.' },
+      { title: 'Measure & quote', description: 'We measure on site and recommend the right system.' },
+      { title: 'Manufacture', description: 'Every unit is built to your exact dimensions.' },
+      { title: 'Install & warranty', description: 'Fitted and sealed by our technicians, backed by warranty.' },
+    ],
+  },
   portfolioTeaser: {
     title: 'Our Previous Work',
     subtitle: 'A look at recent UPVC installations completed by our team',
     seeAll: 'See All Projects',
+    followUs: 'Follow our latest installations',
   },
   portfolioPage: {
     title: 'Our Work',
@@ -87,7 +98,7 @@ export const en: Dictionary = {
     nameLabel: 'Name (optional)',
     namePlaceholder: 'Your name',
     phoneLabel: 'Phone Number',
-    phonePlaceholder: '05xxxxxxxx',
+    phonePlaceholder: '01xxxxxxxxx',
     timeLabel: 'Preferred Time to Call (optional)',
     timeOptions: {
       any: 'Any time',

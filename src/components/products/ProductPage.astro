@@ -1,7 +1,10 @@
 ---
 import Icon from '../Icon.astro';
+import PageHeader from '../PageHeader.astro';
+import CallbackSection from '../CallbackSection.astro';
 import { path, useTranslations, type Lang } from '../../i18n/utils';
 import type { Product } from '../../lib/dataStore';
+import { productIcon } from '../../lib/site';
 
 interface Props {
   product: Product;
@@ -26,30 +29,37 @@ function getYoutubeEmbedUrl(watchUrl: string): string {
 }
 ---
 
-<section class="bg-gradient-to-b from-brand-800 to-brand-950 text-white">
-  <div class="mx-auto flex max-w-4xl flex-col items-start gap-4 px-4 py-16 sm:px-6 md:py-20">
-    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
-      <Icon name="box" class="h-6 w-6" />
-    </div>
-    <h1 class="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{title}</h1>
-    <p class="max-w-2xl text-lg leading-relaxed text-brand-100">{tagline}</p>
-  </div>
-</section>
+<PageHeader title={title} intro={tagline}>
+  <a
+    slot="eyebrow"
+    href={path('products', lang)}
+    class="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-semibold text-brand-100 hover:bg-white/20"
+  >
+    <Icon name={productIcon(product.slug)} class="h-4 w-4" />
+    {t.nav.products}
+  </a>
+  <a
+    href={path('contact', lang)}
+    class="mt-2 inline-flex items-center rounded-xl bg-accent-500 px-7 py-4 text-base font-extrabold text-brand-950 transition hover:bg-accent-400"
+  >
+    {t.productCommon.ctaButton}
+  </a>
+</PageHeader>
 
-<article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 md:py-16">
-  <div class="whitespace-pre-line text-base leading-relaxed text-slate-700">{article}</div>
+<article class="mx-auto max-w-3xl px-4 py-16 sm:px-6 md:py-20">
+  <div class="whitespace-pre-line text-[17px] leading-[1.8] text-brand-900">{article}</div>
 </article>
 
 {
   product.images.length > 0 && (
-    <section class="bg-slate-50 py-14 md:py-16" aria-labelledby="photo-examples-heading">
-      <div class="mx-auto max-w-5xl px-4 sm:px-6">
-        <h2 id="photo-examples-heading" class="text-2xl font-extrabold tracking-tight text-slate-900">
+    <section class="border-y border-brand-100 bg-white py-16 md:py-20" aria-labelledby="photo-examples-heading">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <h2 id="photo-examples-heading" class="text-3xl font-extrabold tracking-tight">
           {t.productCommon.photoExamples}
         </h2>
-        <div class="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {product.images.map((image) => (
-            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="aspect-[4/3] overflow-hidden rounded-3xl bg-brand-100">
               <img src={image} alt={title} class="h-full w-full object-cover" loading="lazy" decoding="async" />
             </div>
           ))}
@@ -61,11 +71,11 @@ function getYoutubeEmbedUrl(watchUrl: string): string {
 
 {
   product.videoUrl && (
-    <section class="mx-auto max-w-4xl px-4 py-14 sm:px-6 md:py-16" aria-labelledby="video-heading">
-      <h2 id="video-heading" class="text-2xl font-extrabold tracking-tight text-slate-900">
+    <section class="mx-auto max-w-4xl px-4 py-16 sm:px-6 md:py-20" aria-labelledby="video-heading">
+      <h2 id="video-heading" class="text-3xl font-extrabold tracking-tight">
         {t.productCommon.watchVideo}
       </h2>
-      <div class="mt-6 aspect-video overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-sm">
+      <div class="mt-8 aspect-video overflow-hidden rounded-3xl bg-brand-950 shadow-xl shadow-brand-950/10">
         <iframe
           class="h-full w-full"
           src={getYoutubeEmbedUrl(product.videoUrl)}
@@ -79,15 +89,6 @@ function getYoutubeEmbedUrl(watchUrl: string): string {
   )
 }
 
-<section class="bg-brand-700 text-white">
-  <div class="mx-auto flex max-w-4xl flex-col items-start gap-4 px-4 py-14 sm:px-6 md:py-16">
-    <h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">{t.productCommon.ctaTitle}</h2>
-    <p class="max-w-xl text-brand-100">{t.productCommon.ctaSubtitle}</p>
-    <a
-      href={path('contact', lang)}
-      class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-bold text-brand-800 shadow-lg transition hover:bg-brand-50"
-    >
-      {t.productCommon.ctaButton}
-    </a>
-  </div>
-</section>
+<div class="pt-4">
+  <CallbackSection lang={lang} />
+</div>

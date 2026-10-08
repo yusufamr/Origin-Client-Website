@@ -23,7 +23,7 @@ function pageHref(page: number): string {
       <a
         href={pageHref(Math.max(1, currentPage - 1))}
         aria-disabled={currentPage === 1}
-        class={`flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700 ${
+        class={`flex h-11 w-11 items-center justify-center rounded-xl border border-brand-200 bg-white text-brand-800 transition hover:border-brand-600 hover:text-brand-700 ${
           currentPage === 1 ? 'pointer-events-none opacity-40' : ''
         }`}
         aria-label={t.pagination.previous}
@@ -35,10 +35,10 @@ function pageHref(page: number): string {
         <a
           href={pageHref(page)}
           aria-current={page === currentPage ? 'page' : undefined}
-          class={`flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold transition ${
+          class={`flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-semibold transition ${
             page === currentPage
-              ? 'border-brand-600 bg-brand-600 text-white'
-              : 'border-slate-300 text-slate-600 hover:border-brand-600 hover:text-brand-700'
+              ? 'border-brand-950 bg-brand-950 text-white'
+              : 'border-brand-200 bg-white text-brand-800 hover:border-brand-600 hover:text-brand-700'
           }`}
         >
           {page}
@@ -48,7 +48,7 @@ function pageHref(page: number): string {
       <a
         href={pageHref(Math.min(totalPages, currentPage + 1))}
         aria-disabled={currentPage === totalPages}
-        class={`flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700 ${
+        class={`flex h-11 w-11 items-center justify-center rounded-xl border border-brand-200 bg-white text-brand-800 transition hover:border-brand-600 hover:text-brand-700 ${
           currentPage === totalPages ? 'pointer-events-none opacity-40' : ''
         }`}
         aria-label={t.pagination.next}

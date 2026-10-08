@@ -17,6 +17,7 @@ export const ar: Dictionary = {
     subtitle:
       'تقدّم أورجين يو بي في سي نوافذ وكبائن استحمام ورولر شتر مصنوعة من مادة UPVC عالية الجودة، مصممة للعزل الحراري والصوتي والأمان، وتُركَّب بخبرة ودقة عالية.',
     cta: 'اطلب اتصالاً مجانياً',
+    whatsappCta: 'تواصل عبر واتساب',
   },
   services: {
     title: 'منتجاتنا',
@@ -49,10 +50,20 @@ export const ar: Dictionary = {
       },
     ],
   },
+  process: {
+    title: 'كيف نعمل',
+    steps: [
+      { title: 'اطلب اتصالاً', description: 'اترك رقمك والوقت المناسب للتواصل معك.' },
+      { title: 'المقاسات والتسعير', description: 'نأخذ المقاسات في الموقع ونرشّح لك النظام الأنسب.' },
+      { title: 'التصنيع', description: 'كل وحدة تُصنَّع بمقاساتك الدقيقة.' },
+      { title: 'التركيب والضمان', description: 'يركّبها فنيونا بإحكام، مع ضمان من الشركة المصنعة.' },
+    ],
+  },
   portfolioTeaser: {
     title: 'أعمالنا السابقة',
     subtitle: 'نظرة على أحدث مشاريع تركيب UPVC التي أنجزها فريقنا',
     seeAll: 'مشاهدة كل الأعمال',
+    followUs: 'تابع أحدث أعمالنا',
   },
   portfolioPage: {
     title: 'أعمالنا',
@@ -83,7 +94,7 @@ export const ar: Dictionary = {
     nameLabel: 'الاسم (اختياري)',
     namePlaceholder: 'اسمك',
     phoneLabel: 'رقم الهاتف',
-    phonePlaceholder: '05xxxxxxxx',
+    phonePlaceholder: '01xxxxxxxxx',
     timeLabel: 'الوقت المفضل للاتصال (اختياري)',
     timeOptions: {
       any: 'أي وقت',

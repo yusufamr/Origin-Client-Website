@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import logo from '../assets/logo.png';
 import { getLangFromUrl, path, useTranslations } from '../i18n/utils';
+import { MAPS_LINK, PHONE_LINK, SOCIAL_LINKS, WHATSAPP_LINK, WHATSAPP_NUMBER } from '../lib/site';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -14,73 +15,61 @@ const quickLinks = [
   { href: path('portfolio', lang), label: t.nav.portfolio },
   { href: path('contact', lang), label: t.nav.requestCall },
 ];
-
-const WHATSAPP_NUMBER = '+20 127 368 3473';
-const WHATSAPP_LINK = 'https://wa.me/201273683473';
-const PHONE_LINK = 'tel:+201273683473';
-const MAPS_LINK = 'https://maps.app.goo.gl/SziKtrcp2LiKLaMp9';
-
-const socialLinks = [
-  { name: 'instagram' as const, label: t.social.instagram, href: 'https://www.instagram.com/originupvc?igsh=M283YTZlN2luYWlm' },
-  { name: 'tiktok' as const, label: t.social.tiktok, href: 'https://www.tiktok.com/@origin.upvc.for.w?_r=1&_t=ZS-98WKUjvqZqW' },
-  { name: 'facebook' as const, label: t.social.facebook, href: 'https://www.facebook.com/share/1G5k9S5XuD/?mibextid=wwXIfr' },
-  { name: 'youtube' as const, label: t.social.youtube, href: 'https://www.youtube.com/@OriginUPVC' },
-  { name: 'whatsapp' as const, label: t.social.whatsapp, href: WHATSAPP_LINK },
-];
 ---
 
-<footer class="border-t border-slate-200 bg-slate-50">
-  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-3">
+<footer class="border-t border-brand-100 bg-white">
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
     <div>
-      <Image src={logo} alt="Origin UPVC" class="h-12 w-auto" />
-      <p class="mt-3 max-w-xs text-sm text-slate-600">{t.footer.tagline}</p>
+      <Image src={logo} alt="Origin UPVC" class="h-11 w-auto" />
+      <p class="mt-4 max-w-xs text-sm leading-relaxed text-brand-800/80">{t.footer.tagline}</p>
 
-      <div class="mt-5 flex gap-3">
-        {socialLinks.map((social) => (
+      <p class="mt-6 text-xs font-extrabold uppercase tracking-widest text-brand-600">{t.footer.followUs}</p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        {SOCIAL_LINKS.map((social) => (
           <a
             href={social.href}
-            aria-label={social.label}
+            aria-label={t.social[social.name]}
             target="_blank"
             rel="noopener noreferrer"
-            class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-brand-600 hover:text-brand-700"
+            class="flex h-11 w-11 items-center justify-center rounded-xl border border-brand-100 text-brand-800 transition hover:border-brand-500 hover:bg-brand-50 hover:text-brand-600"
           >
-            <Icon name={social.name} class="h-4 w-4" />
+            <Icon name={social.name} class="h-5 w-5" />
           </a>
         ))}
       </div>
     </div>
 
     <div>
-      <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">{t.footer.quickLinks}</p>
-      <ul class="mt-4 space-y-2">
+      <p class="text-xs font-extrabold uppercase tracking-widest text-brand-600">{t.footer.quickLinks}</p>
+      <ul class="mt-4 space-y-3">
         {quickLinks.map((link) => (
           <li>
-            <a href={link.href} class="text-sm text-slate-600 hover:text-brand-700">{link.label}</a>
+            <a href={link.href} class="text-sm font-medium text-brand-900 hover:text-brand-600">{link.label}</a>
           </li>
         ))}
       </ul>
     </div>
 
     <div>
-      <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">{t.footer.contactUs}</p>
-      <ul class="mt-4 space-y-3 text-sm text-slate-600">
+      <p class="text-xs font-extrabold uppercase tracking-widest text-brand-600">{t.footer.contactUs}</p>
+      <ul class="mt-4 space-y-3 text-sm font-medium text-brand-900">
         {t.footer.phone && (
           <li class="flex items-center gap-2">
-            <Icon name="phone" class="h-4 w-4 shrink-0 text-brand-600" />
-            <a href={PHONE_LINK} class="hover:text-brand-700">
+            <Icon name="phone" class="h-4 w-4 shrink-0 text-brand-500" />
+            <a href={PHONE_LINK} class="hover:text-brand-600">
               <bdi dir="ltr">{t.footer.phone}</bdi>
             </a>
           </li>
         )}
         <li class="flex items-center gap-2">
-          <Icon name="whatsapp" class="h-4 w-4 shrink-0 text-brand-600" />
-          <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" class="hover:text-brand-700">
+          <Icon name="whatsapp" class="h-4 w-4 shrink-0 text-brand-500" />
+          <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" class="hover:text-brand-600">
             {t.footer.whatsapp}: <bdi dir="ltr">{WHATSAPP_NUMBER}</bdi>
           </a>
         </li>
         <li class="flex items-center gap-2">
-          <Icon name="map-pin" class="h-4 w-4 shrink-0 text-brand-600" />
-          <a href={MAPS_LINK} target="_blank" rel="noopener noreferrer" class="hover:text-brand-700">
+          <Icon name="map-pin" class="h-4 w-4 shrink-0 text-brand-500" />
+          <a href={MAPS_LINK} target="_blank" rel="noopener noreferrer" class="hover:text-brand-600">
             {t.footer.address}
           </a>
         </li>
@@ -88,8 +77,8 @@ const socialLinks = [
     </div>
   </div>
 
-  <div class="border-t border-slate-200 py-5">
-    <p class="mx-auto max-w-6xl px-4 text-center text-xs text-slate-500 sm:px-6">
+  <div class="border-t border-brand-100 py-5">
+    <p class="mx-auto max-w-6xl px-4 text-center text-xs text-brand-700 sm:px-6">
       &copy; {year} {t.footer.copyright}
     </p>
   </div>

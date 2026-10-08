@@ -16,6 +16,7 @@ export interface Dictionary {
     title: string;
     subtitle: string;
     cta: string;
+    whatsappCta: string;
   };
   services: {
     title: string;
@@ -28,10 +29,15 @@ export interface Dictionary {
     subtitle: string;
     points: { title: string; description: string }[];
   };
+  process: {
+    title: string;
+    steps: { title: string; description: string }[];
+  };
   portfolioTeaser: {
     title: string;
     subtitle: string;
     seeAll: string;
+    followUs: string;
   };
   portfolioPage: {
     title: string;

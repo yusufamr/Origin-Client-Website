@@ -3,13 +3,37 @@ import type { Dictionary } from '../i18n/translations';
 
 interface Props {
   dict: Dictionary['contactPage'];
+  /** "dark" renders on the brand-950 callback card. */
+  variant?: 'light' | 'dark';
 }
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
 const PHONE_PATTERN = /^[0-9+\-\s()]{7,20}$/;
 
-export default function ContactForm({ dict }: Props) {
+const STYLES = {
+  light: {
+    success: 'rounded-2xl border border-brand-200 bg-brand-50 p-8 text-center',
+    successTitle: 'text-xl font-bold text-brand-900',
+    successBody: 'mt-2 text-brand-700',
+    label: 'block text-sm font-semibold text-brand-900',
+    input:
+      'mt-1.5 w-full rounded-xl border border-brand-200 bg-white px-4 py-3 text-brand-950 placeholder:text-brand-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100',
+    error: 'text-sm text-red-600',
+  },
+  dark: {
+    success: 'rounded-2xl border border-brand-700 bg-brand-900 p-8 text-center',
+    successTitle: 'text-xl font-bold text-white',
+    successBody: 'mt-2 text-brand-200',
+    label: 'block text-sm font-semibold text-brand-100',
+    input:
+      'mt-1.5 w-full rounded-xl border border-brand-600 bg-brand-900 px-4 py-3 text-white placeholder:text-brand-400 focus:border-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/30',
+    error: 'text-sm text-red-300',
+  },
+} as const;
+
+export default function ContactForm({ dict, variant = 'light' }: Props) {
+  const css = STYLES[variant];
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [time, setTime] = useState('any');
@@ -48,17 +72,17 @@ export default function ContactForm({ dict }: Props) {
 
   if (status === 'success') {
     return (
-      <div className="rounded-2xl border border-brand-200 bg-brand-50 p-8 text-center">
-        <h3 className="text-xl font-bold text-brand-800">{dict.successTitle}</h3>
-        <p className="mt-2 text-brand-700">{dict.successBody}</p>
+      <div className={css.success}>
+        <h3 className={css.successTitle}>{dict.successTitle}</h3>
+        <p className={css.successBody}>{dict.successBody}</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+    <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2" noValidate>
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="name" className={css.label}>
           {dict.nameLabel}
         </label>
         <input
@@ -68,13 +92,13 @@ export default function ContactForm({ dict }: Props) {
           onChange={(e) => setName(e.target.value)}
           placeholder={dict.namePlaceholder}
           maxLength={120}
-          className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
+          className={css.input}
         />
       </div>
 
       <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
-          {dict.phoneLabel} <span className="text-red-600">*</span>
+        <label htmlFor="phone" className={css.label}>
+          {dict.phoneLabel} <span className="text-accent-500">*</span>
         </label>
         <input
           id="phone"
@@ -84,19 +108,19 @@ export default function ContactForm({ dict }: Props) {
           placeholder={dict.phonePlaceholder}
           required
           aria-invalid={Boolean(fieldError)}
-          className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
+          className={css.input}
         />
       </div>
 
-      <div>
-        <label htmlFor="time" className="block text-sm font-medium text-slate-700">
+      <div className="sm:col-span-2">
+        <label htmlFor="time" className={css.label}>
           {dict.timeLabel}
         </label>
         <select
           id="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100"
+          className={css.input}
         >
           <option value="any">{dict.timeOptions.any}</option>
           <option value="morning">{dict.timeOptions.morning}</option>
@@ -105,13 +129,13 @@ export default function ContactForm({ dict }: Props) {
         </select>
       </div>
 
-      {fieldError && <p className="text-sm text-red-600">{fieldError}</p>}
-      {status === 'error' && <p className="text-sm text-red-600">{dict.errorBody}</p>}
+      {fieldError && <p className={`${css.error} sm:col-span-2`}>{fieldError}</p>}
+      {status === 'error' && <p className={`${css.error} sm:col-span-2`}>{dict.errorBody}</p>}
 
       <button
         type="submit"
         disabled={status === 'submitting'}
-        className="w-full rounded-full bg-brand-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-xl bg-accent-500 px-6 py-4 text-base font-extrabold text-brand-950 transition hover:bg-accent-400 disabled:cursor-not-allowed disabled:opacity-60 sm:col-span-2"
       >
         {status === 'submitting' ? dict.submitting : dict.submit}
       </button>
