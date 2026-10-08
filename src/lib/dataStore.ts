@@ -1,15 +1,45 @@
 import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
 
-// Resolved against the process cwd, which is the project root both in `astro dev`
-// and when running the built standalone server via `node ./dist/server/entry.mjs`
-// from the project directory (see README for the deploy command).
-const ROOT = process.cwd();
-const REQUESTS_PATH = path.join(ROOT, 'src/data/requests.json');
-const PORTFOLIO_JSON_PATH = path.join(ROOT, 'src/content/portfolio/portfolio.json');
-const PORTFOLIO_IMAGES_DIR = path.join(ROOT, 'public/portfolio');
-const PRODUCTS_JSON_PATH = path.join(ROOT, 'src/content/products/products.json');
-const PRODUCTS_IMAGES_DIR = path.join(ROOT, 'public/products');
+// Root of all runtime data (JSON files + uploaded images). In production this
+// is the Railway volume (DATA_DIR, or the RAILWAY_VOLUME_MOUNT_PATH Railway sets
+// automatically) so data survives redeploys. Locally it falls back to the
+// project root, keeping the same layout as seed/.
+export const DATA_DIR =
+  process.env.DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT_PATH || process.cwd();
+const REQUESTS_PATH = path.join(DATA_DIR, 'src/data/requests.json');
+const PORTFOLIO_JSON_PATH = path.join(DATA_DIR, 'src/content/portfolio/portfolio.json');
+const PORTFOLIO_IMAGES_DIR = path.join(DATA_DIR, 'public/portfolio');
+const PRODUCTS_JSON_PATH = path.join(DATA_DIR, 'src/content/products/products.json');
+const PRODUCTS_IMAGES_DIR = path.join(DATA_DIR, 'public/products');
+
+// Uploaded images live outside the build output, so the server can't serve
+// them as static files; middleware.ts serves them through this instead.
+const IMAGE_TYPES: Record<string, string> = {
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.gif': 'image/gif',
+  '.avif': 'image/avif',
+};
+
+export async function readUploadedImage(
+  publicPath: string
+): Promise<{ body: Buffer; contentType: string } | null> {
+  const match = /^\/(portfolio|products)\/([^/\\]+)$/.exec(publicPath);
+  if (!match) return null;
+  const filename = decodeURIComponent(match[2]);
+  const contentType = IMAGE_TYPES[path.extname(filename).toLowerCase()];
+  if (!contentType || filename.includes('..') || /[/\\]/.test(filename)) return null;
+  try {
+    const body = await readFile(path.join(DATA_DIR, 'public', match[1], filename));
+    return { body, contentType };
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null;
+    throw err;
+  }
+}
 
 export interface CallRequest {
   id: string;
@@ -194,7 +224,7 @@ function uniqueSlug(base: string, existing: Product[]): string {
 
 async function unlinkPublicFile(publicPath: string): Promise<void> {
   try {
-    await unlink(path.join(ROOT, 'public', publicPath.replace(/^\//, '')));
+    await unlink(path.join(DATA_DIR, 'public', publicPath.replace(/^\//, '')));
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
   }

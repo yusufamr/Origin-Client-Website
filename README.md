@@ -119,27 +119,15 @@ placeholder that needs a final value before launch:
 
 ## Deployment
 
-This site needs a Node.js runtime (it is **not** a static export) because of
-the admin panel and portfolio manager's file writes. Any host that can run a
-persistent Node process works (a VPS, Docker container, Render, Railway,
-etc. — not static hosts like GitHub Pages or Netlify's static tier).
+The site is hosted on **Railway**. Every push to `main` is built and deployed
+automatically. Runtime data (call requests, portfolio/products JSON and
+uploaded images) lives on a Railway volume, so redeploys never touch it.
 
-See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for the full step-by-step guide
-(build, `ADMIN_PASSWORD` setup, PM2/systemd/Docker examples, reverse proxy +
-HTTPS, protecting data across redeploys). Short version:
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for the full setup, including the
+GoDaddy DNS steps. Short version:
 
-1. `npm run build` — produces `dist/client/` (static assets) and
-   `dist/server/entry.mjs` (the server).
-2. Run the server **from the project root** (so its relative reads/writes to
-   `src/data/`, `src/content/portfolio/`, and `public/portfolio/` resolve
-   correctly):
-   ```sh
-   ADMIN_PASSWORD="your-real-password" node ./dist/server/entry.mjs
-   ```
-   By default it listens on port `4321`; override with `HOST`/`PORT` env vars.
-3. Put a reverse proxy (nginx, Caddy, etc.) in front for HTTPS in production.
-4. Because `src/data/requests.json`, `src/content/portfolio/portfolio.json`,
-   and `public/portfolio/` are written to at runtime, make sure your
-   deployment process doesn't wipe them on redeploy (e.g. back them up, or
-   deploy by pulling code changes into the existing server directory rather
-   than replacing it wholesale).
+- `npm run build`, then `npm start` (runs `server.mjs`, which copies `seed/`
+  into an empty data directory on first boot and then starts the server).
+- `DATA_DIR` (or Railway's `RAILWAY_VOLUME_MOUNT_PATH`) sets where runtime
+  data is stored; without it, the project root is used, as in local dev.
+- `ADMIN_PASSWORD` must be set as an environment variable.

@@ -1,270 +1,183 @@
 # Production Deployment Guide — Origin UPVC
 
-This site runs as a **Node.js server** (via `@astrojs/node`, standalone mode)
-— it is not a static export. That's required because the admin panel and
-portfolio manager read/write real files on disk at runtime:
+The site runs on **Railway** as a Node.js server (`@astrojs/node`, standalone
+mode). It isn't a static export because the admin panel writes files while the
+site is live:
 
-- `src/data/requests.json`
-- `src/content/portfolio/portfolio.json`
-- `public/portfolio/*` (uploaded images)
+- `src/data/requests.json` — call requests from the contact form
+- `src/content/portfolio/portfolio.json` + `public/portfolio/*` (images)
+- `src/content/products/products.json` + `public/products/*` (images)
 
-Any host that can keep a Node process running works: a VPS (Ubuntu/Debian),
-a Docker container, or a platform like Render/Railway. Static-only hosts
-(GitHub Pages, Netlify's static tier, Vercel's static output) will **not**
-work here.
+On Railway these live on a **volume** (a persistent disk). Code deploys never
+touch it. `seed/` holds the starting content in the same folder layout, and
+`server.mjs` copies it into the volume on first boot. Files that already
+exist are never overwritten.
 
----
-
-## 1. Before you build — pre-deploy checklist
-
-- [ ] Set the real production domain in `astro.config.mjs` (`SITE_URL` constant near the top).
-- [ ] Update the `Sitemap:` line in `public/robots.txt` to match the real domain.
-- [ ] Replace every placeholder marked `TODO: replace with client asset` — logo, phone number, WhatsApp number, address, social media links, product/portfolio photos, YouTube video links. Search the codebase:
-  ```sh
-  grep -rn "TODO: replace with client asset" src public
-  ```
-- [ ] Choose a real `ADMIN_PASSWORD` (see step 3) — don't ship the dev/test password.
+**How a deploy works:** push to `main` → Railway runs `npm ci` and
+`npm run build` → starts `npm start` (`server.mjs`) → checks that `/ar/`
+responds → switches traffic to the new version.
 
 ---
 
-## 2. Build
+## 1. Before the first deploy
 
-```sh
-npm ci          # clean install from package-lock.json
-npm run build
-```
-
-This produces:
-
-- `dist/client/` — static assets (JS, CSS, optimized images, sitemap, robots.txt)
-- `dist/server/entry.mjs` — the Node server entry point
-
----
-
-## 3. Configure `ADMIN_PASSWORD`
-
-The admin panel (`/admin`) and portfolio manager (`/admin/portfolio`) both
-check this single password. Set it **on the production machine** — never
-commit a real password to git.
-
-**Option A — `.env` file on the server (simplest):**
-
-```sh
-cp .env.example .env
-```
-
-Edit `.env`:
-
-```
-ADMIN_PASSWORD=a-strong-real-password
-```
-
-The server loads this automatically at startup via the `dotenv` package.
-Changing it later just requires **restarting the server** — no rebuild.
-
-**Option B — a real OS/process-manager environment variable** (takes
-precedence over `.env` if both are set) — see the PM2/systemd/Docker
-examples below.
+- [ ] `SITE_URL` in `astro.config.mjs` and the `Sitemap:` line in
+      `public/robots.txt` use the real domain (currently
+      `https://www.originupvc.com`).
+- [ ] No placeholders left: `grep -rn "TODO: replace with client asset" src public`
+- [ ] **Moving the current live content from Bluehost?** Do this *before* the
+      first Railway deploy, because `seed/` is only copied into an empty volume:
+      1. In Bluehost cPanel → File Manager, download from `~/origin-site/`:
+         `src/content/portfolio/portfolio.json`,
+         `src/content/products/products.json`, and the `public/portfolio/` and
+         `public/products/` folders.
+      2. Put them into the same paths under `seed/` (replace what's there),
+         then commit and push.
+      3. **Don't commit `src/data/requests.json`.** It contains customers'
+         names and phone numbers. Export anything still needed from `/admin`
+         by hand instead.
 
 ---
 
-## 4. Run the server
+## 2. Railway setup (one time)
 
-The server **must run from the project root** — it resolves
-`src/data/requests.json`, `src/content/portfolio/portfolio.json`, and
-`public/portfolio/` relative to its working directory.
+1. Push this repo to GitHub (`main` branch).
+2. Go to <https://railway.com>, sign in **with GitHub**, and choose the
+   **Hobby** plan.
+3. **New Project → Deploy from GitHub repo** → pick `Origin-Client-Website`.
+   If it isn't listed, click *Configure GitHub App* and give Railway access
+   to the repo. The first build starts automatically. Let it run; it will be
+   redeployed in the next steps.
+4. **Add the volume** (this is what keeps the data):
+   open the project canvas → right-click the service (or press `Ctrl+K`) →
+   **Add Volume** → attach it to this service → mount path **`/data`**.
+   Railway sets `RAILWAY_VOLUME_MOUNT_PATH=/data` itself, and the app uses it
+   automatically.
+5. **Variables** tab of the service → **New Variable**:
+   - `ADMIN_PASSWORD` = a strong real password (never the dev one)
 
-By default it listens on port `4321`. Override with `HOST`/`PORT`:
+   Saving variables triggers a redeploy.
+6. **Settings → Networking → Generate Domain**. You get a temporary
+   `something.up.railway.app` address. Open it and check the site works
+   (see section 5) before touching DNS.
+7. **Settings → Source** should show branch `main` with auto-deploy on
+   (the default). From now on, every push to `main` goes live in about 2 minutes.
 
-```sh
-HOST=0.0.0.0 PORT=4321 node ./dist/server/entry.mjs
-```
-
-Quick manual test (no process manager yet):
-
-```sh
-node ./dist/server/entry.mjs
-```
-
-Then in another terminal: `curl http://localhost:4321/` — should redirect
-to `/ar/`.
-
-Don't run it this way long-term though — use a process manager (below) so it
-restarts automatically on crash or server reboot.
-
-### Option: PM2
-
-```sh
-npm install -g pm2
-pm2 start ./dist/server/entry.mjs --name origin-upvc --cwd /path/to/project
-pm2 save
-pm2 startup   # follow the printed instructions to enable on-boot start
-```
-
-PM2 respects the project's `.env` file automatically as long as `--cwd`
-points at the project root.
-
-### Option: systemd
-
-Create `/etc/systemd/system/origin-upvc.service`:
-
-```ini
-[Unit]
-Description=Origin UPVC website
-After=network.target
-
-[Service]
-Type=simple
-WorkingDirectory=/path/to/project
-ExecStart=/usr/bin/node ./dist/server/entry.mjs
-Restart=on-failure
-User=www-data
-Environment=HOST=0.0.0.0
-Environment=PORT=4321
-# Either rely on the project's .env file, or set the real password here instead:
-# Environment=ADMIN_PASSWORD=a-strong-real-password
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```sh
-sudo systemctl daemon-reload
-sudo systemctl enable --now origin-upvc
-sudo systemctl status origin-upvc
-```
-
-### Option: Docker
-
-```dockerfile
-FROM node:22-slim
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-EXPOSE 4321
-CMD ["node", "./dist/server/entry.mjs"]
-```
-
-```sh
-docker build -t origin-upvc .
-docker run -d \
-  -p 4321:4321 \
-  -e ADMIN_PASSWORD=a-strong-real-password \
-  -v $(pwd)/data-volume/requests.json:/app/src/data/requests.json \
-  -v $(pwd)/data-volume/portfolio.json:/app/src/content/portfolio/portfolio.json \
-  -v $(pwd)/data-volume/portfolio-images:/app/public/portfolio \
-  --name origin-upvc \
-  origin-upvc
-```
-
-The volume mounts are important — without them, uploaded portfolio images
-and submitted call requests disappear every time the container is rebuilt
-(see step 6).
+Build and start settings come from `railway.json` in the repo, so there's
+nothing to configure for them in the dashboard. The Node version comes from
+`engines.node` in `package.json`.
 
 ---
 
-## 5. Put a reverse proxy in front (HTTPS + real domain)
+## 3. Connect the GoDaddy domain
 
-The Node server itself doesn't handle TLS. Use nginx or Caddy in front.
+**a. Add the domain in Railway**
 
-### nginx
+1. Service → **Settings → Networking → Custom Domain** → enter
+   `www.originupvc.com`.
+2. Railway shows the DNS records to create: a **CNAME** for `www` (target
+   like `xxxx.up.railway.app`) and possibly a **TXT** verification record.
+   Keep this page open.
 
-```nginx
-server {
-    listen 80;
-    server_name www.yourdomain.com yourdomain.com;
+**b. Check who manages the DNS**
 
-    location / {
-        proxy_pass http://127.0.0.1:4321;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
+GoDaddy → **My Products** → the domain → **DNS** → **Nameservers**.
 
-Then get a free TLS cert:
+- If they're GoDaddy's (`nsXX.domaincontrol.com`), continue below.
+- If they point to Bluehost, either click **Change Nameservers → GoDaddy
+  Nameservers (recommended)**, or make the same record changes in Bluehost's
+  Zone Editor instead. Changing nameservers drops any records that were only
+  set up at Bluehost (for example email/MX), so recreate those in GoDaddy
+  first.
 
-```sh
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-```
+**c. Point `www` at Railway** (GoDaddy → domain → **DNS → DNS Records**)
 
-### Caddy (auto-HTTPS, simpler)
+1. Find the existing `CNAME` record named `www` → **Edit** (pencil icon).
+   If there's none, **Add New Record** → Type `CNAME`, Name `www`.
+2. **Value** = the target Railway showed. TTL = 1 hour (or 600 seconds).
+   Save.
+3. If Railway showed a TXT record, **Add New Record** → Type `TXT`, with
+   exactly the Name and Value it gave you.
+4. Don't change `MX` records (email) or any other records you don't recognise.
 
-```
-yourdomain.com, www.yourdomain.com {
-    reverse_proxy 127.0.0.1:4321
-}
-```
+**d. Send the bare domain to `www`** (GoDaddy can't point the root `@` at a
+CNAME)
 
-Caddy handles TLS certificates automatically — no certbot needed.
+1. Same DNS page → **Forwarding** tab → **Add Forwarding** → **Domain**.
+2. Forward to `https://` + `www.originupvc.com`, type **Permanent (301)**,
+   no masking. Save.
+3. GoDaddy updates the root `A` record for the forward. Delete any leftover
+   `A` record for `@` that pointed at Bluehost if GoDaddy didn't replace it.
 
----
+**e. Wait for verification**
 
-## 6. Protect your data across redeploys
-
-These are written to at runtime and are **git-ignored** — they live only on
-the server's disk:
-
-- `src/data/requests.json`
-- `src/content/portfolio/portfolio.json`, `public/portfolio/*`
-- `src/content/products/products.json`, `public/products/*`
-
-`seed/` holds the starting content with the same folder layout. After a fresh
-clone, run `cp -rn seed/. .` to copy in any missing files (`-n` never
-overwrites existing live data). Whatever your redeploy process is, make sure
-it doesn't wipe these:
-
-- **Git-pull-based deploys:** deploy by `git pull` + `npm run build` inside
-  the existing project directory, rather than deleting and re-cloning. Since
-  these files are git-ignored, a `git pull` won't touch them.
-- **Bluehost (cPanel Application Manager / Passenger):**
-  `.github/workflows/deploy.yml` deploys on every push to `main` (secrets:
-  `SSH_HOST`, `SSH_USER`, `SSH_KEY`, optional `SSH_PORT`). It builds on
-  GitHub's runner — shared hosting's thread limits crash `astro build` — then
-  uploads `dist/`, runs `npm ci` on the server and restarts Passenger. Node 22
-  is installed per-user with nvm (`~/.nvm`); the app's startup file is
-  `app.js`, and `.htaccess` needs `PassengerNodejs <path to nvm node>`.
-- **Docker:** mount them as volumes (see the Docker example above) so they
-  survive `docker build`/container recreation.
-- **Any setup:** back them up periodically:
-  ```sh
-  cp src/data/requests.json backups/requests-$(date +%F).json
-  cp src/content/portfolio/portfolio.json backups/portfolio-$(date +%F).json
-  cp src/content/products/products.json backups/products-$(date +%F).json
-  ```
+Back in Railway's Networking settings the domain turns green once DNS
+propagates (usually minutes, sometimes up to a few hours). Railway issues
+the HTTPS certificate automatically, with no other setup.
 
 ---
 
-## 7. Redeploying after a code change
+## 4. Turn off Bluehost
+
+Only after `https://www.originupvc.com` loads from Railway and section 5
+passes:
+
+1. Delete the repository secrets `SSH_HOST`, `SSH_USER`, `SSH_KEY`, `SSH_PORT`
+   (GitHub repo → Settings → Secrets and variables → Actions). The old
+   deploy workflow has already been removed from the repo.
+2. Cancel the Bluehost hosting plan, but keep it until you're sure nothing
+   else (such as email) still depends on it.
+
+---
+
+## 5. Smoke test (after the first deploy and after DNS)
 
 ```sh
-git pull                # or however you get new code onto the server
+curl -I https://www.originupvc.com/                  # 302 → /ar/
+curl -I https://originupvc.com/                      # 301 → https://www.originupvc.com/
+curl -I https://www.originupvc.com/en/
+curl -I https://www.originupvc.com/sitemap-index.xml
+curl -I https://www.originupvc.com/portfolio/portfolio-1.jpg   # 200 image/jpeg
+```
+
+Then in a browser:
+
+1. Submit a call request on `/en/contact/` and check it appears in `/admin`.
+2. Add a portfolio item with a photo in `/admin/portfolio` and check the photo
+   shows on `/en/portfolio/`.
+3. Push any small commit, wait for the deploy to finish, and check that the
+   item from step 2 is **still there**. That proves the volume works.
+
+---
+
+## 6. Day to day
+
+- **Deploying:** commit and push to `main`. Watch progress in Railway's
+  **Deployments** tab. A failed build doesn't take the site down: the
+  previous version keeps running.
+- **Rolling back:** Deployments → open an older successful deploy →
+  **Redeploy**.
+- **Logs:** Deployments → the active deploy → **View Logs**.
+- **Changing the admin password:** edit `ADMIN_PASSWORD` in Variables. The
+  service restarts with it, and no code change is needed.
+- **Backups:** the volume holds the only copy of the client's uploads and
+  requests. Turn on backups on the volume (click the volume →
+  **Backups**) if your plan includes them. Otherwise, periodically download
+  copies from `/admin`.
+- **Cost:** the Hobby plan is a monthly fee that includes some usage. A site
+  this size normally stays within or close to it. Check **Usage** in the
+  Railway account settings during the first month.
+
+---
+
+## Running the production build locally
+
+```sh
 npm ci
 npm run build
-pm2 restart origin-upvc # or: sudo systemctl restart origin-upvc
+ADMIN_PASSWORD=test npm start          # http://localhost:4321
 ```
 
-Because `ADMIN_PASSWORD` is read from `.env`/environment at server *startup*
-(not baked into the build), you generally don't need to touch it on
-redeploy — it's only affected if you edit `.env` and restart.
-
----
-
-## 8. Post-deploy smoke test
-
-```sh
-curl -I https://yourdomain.com/                 # should redirect to /ar/
-curl -I https://yourdomain.com/en/
-curl -I https://yourdomain.com/robots.txt
-curl -I https://yourdomain.com/sitemap-index.xml
-curl -I https://yourdomain.com/admin            # should load (noindex, password gate)
-```
-
-Then in a browser: submit a test call request via `/en/contact/`, confirm
-it shows up in `/admin`, and try adding/deleting a portfolio item via
-`/admin/portfolio`.
+Without `DATA_DIR`, data is read from and written to the project root (the
+git-ignored files, same as `astro dev`). Set `DATA_DIR=/some/folder` to
+test with a separate empty data folder, which gets filled from `seed/`.
