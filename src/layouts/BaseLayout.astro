@@ -32,6 +32,15 @@ const direction = dir(lang);
       rel="stylesheet"
     />
     <SEOHead title={title} description={description} noindex={noindex} ogImage={ogImage} />
+    <!-- Google tag (gtag.js); public pages only, AdminLayout doesn't include it -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-XL5GSPV0S5"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XL5GSPV0S5');
+    </script>
     <slot name="head" />
   </head>
   <body class="flex min-h-screen flex-col bg-surface text-brand-950 antialiased">
