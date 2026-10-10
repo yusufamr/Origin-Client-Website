@@ -12,7 +12,7 @@ const i18n = i18nMiddleware({
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
-  if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+  if (pathname.startsWith('/admin') || pathname.startsWith('/api') || pathname === '/sitemap-index.xml') {
     return next();
   }
   // Admin-uploaded images are stored in the data directory, not the build.

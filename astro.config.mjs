@@ -5,7 +5,6 @@ import react from '@astrojs/react';
 
 import tailwindcss from '@tailwindcss/vite';
 
-import sitemap from '@astrojs/sitemap';
 
 import node from '@astrojs/node';
 
@@ -34,18 +33,9 @@ export default defineConfig({
   },
 
   integrations: [
-    react(),
-    sitemap({
-      i18n: {
-        defaultLocale: 'ar',
-        locales: {
-          ar: 'ar',
-          en: 'en'
-        }
-      },
-      // Admin pages must never be indexed or listed in the sitemap.
-      filter: (page) => !page.includes('/admin')
-    })
+    // The sitemap is served live by src/pages/sitemap-index.xml.ts so it
+    // includes products added from the admin panel.
+    react()
   ],
 
   vite: {
