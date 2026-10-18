@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticlePage from '../../../components/articles/ArticlePage.astro';
+import { getProductBySlug } from '../../../lib/dataStore';
+
+const { slug } = Astro.params;
+const article = slug ? await getProductBySlug(slug) : undefined;
+
+if (!article) {
+  return Astro.redirect('/en/articles/');
+}
+---
+
+<BaseLayout title={article.titleEn} description={article.taglineEn}>
+  <ArticlePage article={article} lang="en" />
+</BaseLayout>

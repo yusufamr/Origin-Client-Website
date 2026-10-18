@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import ArticleCard from '../../../components/articles/ArticleCard.astro';
+import CallbackSection from '../../../components/CallbackSection.astro';
+import Pagination from '../../../components/Pagination.astro';
+import { path, useTranslations } from '../../../i18n/utils';
+import { getProducts } from '../../../lib/dataStore';
+import { paginate } from '../../../lib/pagination';
+
+const lang = 'en' as const;
+const t = useTranslations(lang);
+
+// Articles are the entries managed under /admin/products.
+const allArticles = await getProducts();
+const requestedPage = Number(Astro.url.searchParams.get('page')) || 1;
+const { items: articles, currentPage, totalPages } = paginate(allArticles, requestedPage);
+---
+
+<BaseLayout title={t.articlesPage.title} description={t.articlesPage.description}>
+  <PageHeader title={t.articlesPage.title} intro={t.articlesPage.intro} />
+
+  <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
+    {articles.length > 0 ? (
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {articles.map((article) => (
+          <ArticleCard
+            title={article.titleEn}
+            excerpt={article.taglineEn}
+            href={path(`articles/${article.slug}`, lang)}
+            readMoreLabel={t.articlesPage.readMore}
+            image={article.images[0]}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="text-brand-700">{t.articlesPage.empty}</p>
+    )}
+
+    <Pagination currentPage={currentPage} totalPages={totalPages} basePath={path('articles', lang)} lang={lang} />
+  </section>
+
+  <CallbackSection lang={lang} />
+</BaseLayout>
