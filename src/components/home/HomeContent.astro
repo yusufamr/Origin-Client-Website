@@ -6,8 +6,8 @@ import Icon from '../Icon.astro';
 import JsonLd from '../JsonLd.astro';
 import heroWindow from '../../assets/hero-window.jpg';
 import { getLangFromUrl, path, useTranslations } from '../../i18n/utils';
-import { getPortfolioItems, getProducts } from '../../lib/dataStore';
-import { SOCIAL_LINKS, WHATSAPP_LINK, productIcon } from '../../lib/site';
+import { getPortfolioItems } from '../../lib/dataStore';
+import { PRODUCTS, SOCIAL_LINKS, WHATSAPP_LINK } from '../../lib/site';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -16,9 +16,6 @@ const allPortfolioItems = await getPortfolioItems();
 const latestPortfolioItems = [...allPortfolioItems]
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   .slice(0, 3);
-
-const allProducts = await getProducts();
-const teaserProducts = allProducts.slice(0, 3);
 
 // WhatsApp already has its own button in the hero and footer.
 const followLinks = SOCIAL_LINKS.filter((social) => social.name !== 'whatsapp');
@@ -81,35 +78,22 @@ const followLinks = SOCIAL_LINKS.filter((social) => social.name !== 'whatsapp');
   </div>
 </section>
 
-<section class="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-24" aria-labelledby="services-heading">
+<section id="products" class="mx-auto max-w-6xl scroll-mt-28 px-4 py-20 sm:px-6 md:py-24" aria-labelledby="services-heading">
   <div class="mx-auto max-w-2xl text-center">
     <p class="text-sm font-extrabold uppercase tracking-widest text-brand-600">{t.services.title}</p>
     <h2 id="services-heading" class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">{t.services.subtitle}</h2>
   </div>
 
-  {teaserProducts.length > 0 && (
-    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {teaserProducts.map((product) => (
-        <ServiceCard
-          icon={productIcon(product.slug)}
-          title={lang === 'ar' ? product.titleAr : product.titleEn}
-          description={lang === 'ar' ? product.taglineAr : product.taglineEn}
-          href={path(`products/${product.slug}`, lang)}
-          learnMoreLabel={t.services.learnMore}
-          image={product.images[0]}
-        />
-      ))}
-    </div>
-  )}
-
-  <div class="mt-10 text-center">
-    <a
-      href={path('products', lang)}
-      class="inline-flex items-center gap-1 rounded-xl border border-brand-200 bg-white px-6 py-3 text-sm font-bold text-brand-800 transition hover:border-brand-500"
-    >
-      {t.services.seeAll}
-      <Icon name="chevron-right" class="h-4 w-4 rtl:rotate-180" />
-    </a>
+  <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    {PRODUCTS.map((product) => (
+      <ServiceCard
+        icon={product.icon}
+        title={t.services.items[product.key].title}
+        description={t.services.items[product.key].description}
+        href={path('contact', lang)}
+        ctaLabel={t.services.cta}
+      />
+    ))}
   </div>
 </section>
 

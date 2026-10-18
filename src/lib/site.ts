@@ -14,10 +14,14 @@ export const SOCIAL_LINKS: { name: SocialName; href: string }[] = [
   { name: 'whatsapp', href: WHATSAPP_LINK },
 ];
 
-/** Picks a product icon from its slug; admin-added products fall back to a generic box. */
-export function productIcon(slug: string): 'windows' | 'shower' | 'shutters' | 'box' {
-  if (slug.includes('window')) return 'windows';
-  if (slug.includes('shower')) return 'shower';
-  if (slug.includes('shutter')) return 'shutters';
-  return 'box';
-}
+// The fixed product range shown in the home page's "Our Products" section.
+// Titles and descriptions live in the i18n dictionaries under services.items.
+export const PRODUCTS: {
+  key: 'windows' | 'shutters' | 'doors' | 'showers';
+  icon: 'windows' | 'shutters' | 'door' | 'shower';
+}[] = [
+  { key: 'windows', icon: 'windows' },
+  { key: 'shutters', icon: 'shutters' },
+  { key: 'doors', icon: 'door' },
+  { key: 'showers', icon: 'shower' },
+];

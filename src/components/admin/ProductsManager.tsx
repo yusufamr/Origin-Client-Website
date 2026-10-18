@@ -116,7 +116,7 @@ export default function ProductsManager() {
       !addForm.articleEn.trim() ||
       !addForm.articleAr.trim()
     ) {
-      setAddError('Title, tagline, and article are required in both languages.');
+      setAddError('Title, summary, and article are required in both languages.');
       return;
     }
 
@@ -128,7 +128,7 @@ export default function ProductsManager() {
       const res = await fetch('/api/products/add', { method: 'POST', body: data });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Failed to add product.');
+        throw new Error(body.error || 'Failed to add article.');
       }
       setAddSuccess(true);
       setAddForm(emptyForm);
@@ -136,14 +136,14 @@ export default function ProductsManager() {
       if (addFileInputRef.current) addFileInputRef.current.value = '';
       await loadProducts();
     } catch (err) {
-      setAddError(err instanceof Error ? err.message : 'Failed to add product.');
+      setAddError(err instanceof Error ? err.message : 'Failed to add article.');
     } finally {
       setAddSubmitting(false);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm('Are you sure you want to delete this product? This cannot be undone.')) return;
+    if (!window.confirm('Are you sure you want to delete this article? This cannot be undone.')) return;
     await fetch('/api/products/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -195,13 +195,13 @@ export default function ProductsManager() {
   return (
     <div className="space-y-12">
       <section>
-        <h2 className="text-lg font-bold text-slate-900">Add New Product</h2>
+        <h2 className="text-lg font-bold text-slate-900">Add New Article</h2>
         <form onSubmit={handleAddSubmit} className="mt-4 max-w-2xl space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField label="Title (English)" value={addForm.titleEn} onChange={(v) => setAddForm((f) => ({ ...f, titleEn: v }))} />
             <TextField label="Title (Arabic)" value={addForm.titleAr} onChange={(v) => setAddForm((f) => ({ ...f, titleAr: v }))} dir="rtl" />
-            <TextField label="Tagline (English)" value={addForm.taglineEn} onChange={(v) => setAddForm((f) => ({ ...f, taglineEn: v }))} />
-            <TextField label="Tagline (Arabic)" value={addForm.taglineAr} onChange={(v) => setAddForm((f) => ({ ...f, taglineAr: v }))} dir="rtl" />
+            <TextField label="Summary (English)" value={addForm.taglineEn} onChange={(v) => setAddForm((f) => ({ ...f, taglineEn: v }))} />
+            <TextField label="Summary (Arabic)" value={addForm.taglineAr} onChange={(v) => setAddForm((f) => ({ ...f, taglineAr: v }))} dir="rtl" />
           </div>
 
           <TextArea label="Article (English)" value={addForm.articleEn} onChange={(v) => setAddForm((f) => ({ ...f, articleEn: v }))} rows={8} />
@@ -233,21 +233,21 @@ export default function ProductsManager() {
           </div>
 
           {addError && <p className="text-sm text-red-600">{addError}</p>}
-          {addSuccess && <p className="text-sm text-green-700">Product added successfully.</p>}
+          {addSuccess && <p className="text-sm text-green-700">Article added successfully.</p>}
 
           <button
             type="submit"
             disabled={addSubmitting}
             className="w-full rounded-full bg-brand-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {addSubmitting ? 'Adding...' : 'Add Product'}
+            {addSubmitting ? 'Adding...' : 'Add Article'}
           </button>
         </form>
       </section>
 
       <section>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">Manage Existing Products ({products.length})</h2>
+          <h2 className="text-lg font-bold text-slate-900">Manage Existing Articles ({products.length})</h2>
           <button
             type="button"
             onClick={loadProducts}
@@ -259,7 +259,7 @@ export default function ProductsManager() {
         </div>
 
         {products.length === 0 ? (
-          <p className="mt-4 text-slate-500">No products yet.</p>
+          <p className="mt-4 text-slate-500">No articles yet.</p>
         ) : (
           <div className="mt-4 space-y-6">
             {products.map((product, index) => (
@@ -312,7 +312,7 @@ function ProductEditor({ product, isFirst, isLast, onSaved, onDelete, onReorder 
   async function handleSave() {
     setSaveError('');
     if (!form.titleEn.trim() || !form.titleAr.trim() || !form.taglineEn.trim() || !form.taglineAr.trim() || !form.articleEn.trim() || !form.articleAr.trim()) {
-      setSaveError('Title, tagline, and article are required in both languages.');
+      setSaveError('Title, summary, and article are required in both languages.');
       return;
     }
 
@@ -344,7 +344,7 @@ function ProductEditor({ product, isFirst, isLast, onSaved, onDelete, onReorder 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="font-bold text-slate-900">{product.titleEn} / {product.titleAr}</p>
-          <p className="mt-1 text-sm text-slate-500">/products/{product.slug}</p>
+          <p className="mt-1 text-sm text-slate-500">/articles/{product.slug}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" onClick={() => onReorder('up')} disabled={isFirst} className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-brand-600 hover:text-brand-700 disabled:opacity-40">
@@ -386,8 +386,8 @@ function ProductEditor({ product, isFirst, isLast, onSaved, onDelete, onReorder 
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField label="Title (English)" value={form.titleEn} onChange={(v) => setForm((f) => ({ ...f, titleEn: v }))} />
             <TextField label="Title (Arabic)" value={form.titleAr} onChange={(v) => setForm((f) => ({ ...f, titleAr: v }))} dir="rtl" />
-            <TextField label="Tagline (English)" value={form.taglineEn} onChange={(v) => setForm((f) => ({ ...f, taglineEn: v }))} />
-            <TextField label="Tagline (Arabic)" value={form.taglineAr} onChange={(v) => setForm((f) => ({ ...f, taglineAr: v }))} dir="rtl" />
+            <TextField label="Summary (English)" value={form.taglineEn} onChange={(v) => setForm((f) => ({ ...f, taglineEn: v }))} />
+            <TextField label="Summary (Arabic)" value={form.taglineAr} onChange={(v) => setForm((f) => ({ ...f, taglineAr: v }))} dir="rtl" />
           </div>
 
           <TextArea label="Article (English)" value={form.articleEn} onChange={(v) => setForm((f) => ({ ...f, articleEn: v }))} rows={8} />

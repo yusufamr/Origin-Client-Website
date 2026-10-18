@@ -4,21 +4,16 @@ import Icon from './Icon.astro';
 import LanguageSwitcher from './LanguageSwitcher';
 import logo from '../assets/logo.png';
 import { getLangFromUrl, path, useTranslations } from '../i18n/utils';
-import { getProducts } from '../lib/dataStore';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const navLinks = [
   { href: path('', lang), label: t.nav.home },
+  { href: `${path('', lang)}#products`, label: t.nav.products },
+  { href: path('articles', lang), label: t.nav.articles },
   { href: path('portfolio', lang), label: t.nav.portfolio },
 ];
-
-const products = await getProducts();
-const productLinks = products.map((product) => ({
-  href: path(`products/${product.slug}`, lang),
-  label: lang === 'ar' ? product.titleAr : product.titleEn,
-}));
 ---
 
 <header class="sticky top-0 z-40 bg-brand-950 px-4 py-3 sm:px-6">
@@ -29,33 +24,11 @@ const productLinks = products.map((product) => ({
       </a>
 
       <div class="hidden items-center gap-7 md:flex">
-        <a href={navLinks[0].href} class="text-sm font-semibold text-brand-950 hover:text-brand-600">
-          {navLinks[0].label}
-        </a>
-
-        <details class="group relative">
-          <summary class="flex cursor-pointer list-none items-center gap-1 text-sm font-semibold text-brand-950 hover:text-brand-600">
-            {t.nav.products}
-            <Icon name="chevron-down" class="h-4 w-4 transition group-open:rotate-180" />
-          </summary>
-          <div class="absolute start-0 top-full z-10 mt-4 w-60 rounded-xl border border-brand-100 bg-white p-2 shadow-xl">
-            {productLinks.map((link) => (
-              <a href={link.href} class="block rounded-lg px-3 py-2 text-sm text-brand-900 hover:bg-brand-50">
-                {link.label}
-              </a>
-            ))}
-            <a
-              href={path('products', lang)}
-              class="mt-1 block rounded-lg border-t border-brand-100 px-3 py-2 text-sm font-bold text-brand-600 hover:bg-brand-50"
-            >
-              {t.services.seeAll}
-            </a>
-          </div>
-        </details>
-
-        <a href={navLinks[1].href} class="text-sm font-semibold text-brand-950 hover:text-brand-600">
-          {navLinks[1].label}
-        </a>
+        {navLinks.map((link) => (
+          <a href={link.href} class="text-sm font-semibold text-brand-950 hover:text-brand-600">
+            {link.label}
+          </a>
+        ))}
 
         <LanguageSwitcher client:load currentLang={lang} currentPath={Astro.url.pathname} />
 
@@ -81,18 +54,11 @@ const productLinks = products.map((product) => ({
     </nav>
 
     <div id="mobile-menu" class="hidden flex-col gap-1 border-t border-brand-100 px-3 pb-4 pt-2 md:hidden">
-      <a href={navLinks[0].href} class="rounded-lg px-3 py-2.5 text-sm font-semibold text-brand-950 hover:bg-brand-50">
-        {navLinks[0].label}
-      </a>
-      <p class="px-3 pt-2 text-xs font-bold uppercase tracking-wide text-brand-500">{t.nav.products}</p>
-      {productLinks.map((link) => (
-        <a href={link.href} class="rounded-lg px-3 py-2.5 text-sm font-medium text-brand-900 hover:bg-brand-50">
+      {navLinks.map((link) => (
+        <a href={link.href} class="rounded-lg px-3 py-2.5 text-sm font-semibold text-brand-950 hover:bg-brand-50">
           {link.label}
         </a>
       ))}
-      <a href={navLinks[1].href} class="rounded-lg px-3 py-2.5 text-sm font-semibold text-brand-950 hover:bg-brand-50">
-        {navLinks[1].label}
-      </a>
       <a
         href={path('contact', lang)}
         class="mt-2 rounded-xl bg-accent-500 px-4 py-3 text-center text-sm font-extrabold text-brand-950"

@@ -1,0 +1,40 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  title: string;
+  excerpt: string;
+  href: string;
+  readMoreLabel: string;
+  image?: string;
+}
+
+const { title, excerpt, href, readMoreLabel, image } = Astro.props;
+---
+
+<a
+  href={href}
+  class="group flex flex-col overflow-hidden rounded-3xl border border-brand-100 bg-white transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-950/10"
+>
+  <div class="aspect-[16/10] overflow-hidden bg-brand-100">
+    {image && (
+      <img
+        src={image}
+        alt={title}
+        width="1200"
+        height="750"
+        loading="lazy"
+        decoding="async"
+        class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+      />
+    )}
+  </div>
+  <div class="flex flex-1 flex-col gap-3 p-6">
+    <h2 class="text-xl font-extrabold leading-snug text-brand-950">{title}</h2>
+    <p class="line-clamp-3 flex-1 text-[15px] leading-relaxed text-brand-800/80">{excerpt}</p>
+    <span class="mt-1 inline-flex items-center gap-1 text-sm font-bold text-brand-600 group-hover:text-brand-800">
+      {readMoreLabel}
+      <Icon name="chevron-right" class="h-4 w-4 transition group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
+    </span>
+  </div>
+</a>

@@ -33,6 +33,15 @@ export default defineConfig({
     ],
   },
 
+  // Admin-uploaded content used to be published as "products"; it's now
+  // "articles". Keep old links and search results working.
+  redirects: {
+    '/ar/products': '/ar/articles',
+    '/en/products': '/en/articles',
+    '/ar/products/[slug]': '/ar/articles/[slug]',
+    '/en/products/[slug]': '/en/articles/[slug]',
+  },
+
   // routing: 'manual' — Astro's built-in prefix-enforcement would 404 any
   // non-locale-prefixed route (e.g. /admin, /admin/portfolio). Those routes
   // are intentionally outside the ar/en namespace, so locale handling here is

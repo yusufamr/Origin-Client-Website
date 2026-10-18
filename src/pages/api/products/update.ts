@@ -26,7 +26,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   if (!id) return json({ ok: false, error: 'Missing id.' }, 400);
   if (!titleEn || !titleAr || !taglineEn || !taglineAr || !articleEn || !articleAr) {
-    return json({ ok: false, error: 'Title, tagline, and article are required in both languages.' }, 400);
+    return json({ ok: false, error: 'Title, summary, and article are required in both languages.' }, 400);
   }
   if (videoUrl) {
     try {

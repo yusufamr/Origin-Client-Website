@@ -11,7 +11,8 @@ const year = new Date().getFullYear();
 
 const quickLinks = [
   { href: path('', lang), label: t.nav.home },
-  { href: path('products', lang), label: t.nav.products },
+  { href: `${path('', lang)}#products`, label: t.nav.products },
+  { href: path('articles', lang), label: t.nav.articles },
   { href: path('portfolio', lang), label: t.nav.portfolio },
   { href: path('contact', lang), label: t.nav.requestCall },
 ];

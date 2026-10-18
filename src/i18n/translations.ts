@@ -9,6 +9,7 @@ export interface Dictionary {
   nav: {
     home: string;
     products: string;
+    articles: string;
     portfolio: string;
     requestCall: string;
   };
@@ -21,8 +22,8 @@ export interface Dictionary {
   services: {
     title: string;
     subtitle: string;
-    learnMore: string;
-    seeAll: string;
+    cta: string;
+    items: Record<'windows' | 'shutters' | 'doors' | 'showers', { title: string; description: string }>;
   };
   whyUs: {
     title: string;
@@ -47,11 +48,12 @@ export interface Dictionary {
     dateLabel: string;
     viewImage: string;
   };
-  productsPage: {
+  articlesPage: {
     title: string;
     description: string;
     intro: string;
     empty: string;
+    readMore: string;
   };
   productCommon: {
     ctaTitle: string;

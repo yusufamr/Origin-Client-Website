@@ -9,6 +9,7 @@ export const en: Dictionary = {
   nav: {
     home: 'Home',
     products: 'Products',
+    articles: 'Articles',
     portfolio: 'Our Work',
     requestCall: 'Request a Call',
   },
@@ -22,8 +23,25 @@ export const en: Dictionary = {
   services: {
     title: 'Our Products',
     subtitle: 'Precision-engineered UPVC solutions for every part of your home',
-    learnMore: 'Products Explanation',
-    seeAll: 'See All Products',
+    cta: 'Request a Quote',
+    items: {
+      windows: {
+        title: 'UPVC Windows',
+        description: 'Energy-efficient, weatherproof windows with excellent thermal and sound insulation.',
+      },
+      shutters: {
+        title: 'Roller Shutters',
+        description: 'Heavy-duty roller shutters for security, privacy, and light control.',
+      },
+      doors: {
+        title: 'UPVC Doors',
+        description: 'Durable, secure doors that seal tightly against noise, dust, and weather.',
+      },
+      showers: {
+        title: 'Shower Cabins',
+        description: 'Water-resistant shower cabins for a clean, modern bathroom.',
+      },
+    },
   },
   whyUs: {
     title: 'Why Choose Origin UPVC',
@@ -75,20 +93,21 @@ export const en: Dictionary = {
     dateLabel: 'Completed',
     viewImage: 'View project photo',
   },
-  productsPage: {
-    title: 'Our Products',
+  articlesPage: {
+    title: 'Articles',
     description:
-      'Browse the full range of UPVC windows, shower cabins, and roller shutters manufactured and installed by Origin UPVC.',
-    intro: 'Explore our full catalog of UPVC products, each built for durability, insulation, and modern design.',
-    empty: 'Products will appear here soon.',
+      'Guides, tips, and news about UPVC windows, doors, roller shutters, and shower cabins from Origin UPVC.',
+    intro: 'Guides and insights to help you choose the right UPVC solutions for your home.',
+    empty: 'Articles will appear here soon.',
+    readMore: 'Read Article',
   },
   productCommon: {
     ctaTitle: 'Ready to Upgrade Your Home?',
     ctaSubtitle: 'Request a free call back and our team will help you choose the right fit.',
     ctaButton: 'Request a Free Call',
-    photoExamples: 'Photo Examples',
-    watchVideo: 'Watch How It Works',
-    videoLabel: 'Product demonstration video',
+    photoExamples: 'Photos',
+    watchVideo: 'Watch the Video',
+    videoLabel: 'Video',
   },
   contactPage: {
     title: 'Request a Call',

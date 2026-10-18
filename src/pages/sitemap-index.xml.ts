@@ -2,14 +2,14 @@ import type { APIRoute } from 'astro';
 import { getProducts } from '../lib/dataStore';
 import { path, type Lang } from '../i18n/utils';
 
-// Generated per request (not at build time like @astrojs/sitemap) so product
+// Generated per request (not at build time like @astrojs/sitemap) so article
 // pages added from the admin panel are listed as soon as they exist.
 const LANGS: Lang[] = ['ar', 'en'];
-const STATIC_PAGES = ['', 'products', 'portfolio', 'contact'];
+const STATIC_PAGES = ['', 'articles', 'portfolio', 'contact'];
 
 export const GET: APIRoute = async ({ site }) => {
   const products = await getProducts();
-  const pages = [...STATIC_PAGES, ...products.map((p) => `products/${p.slug}`)];
+  const pages = [...STATIC_PAGES, ...products.map((p) => `articles/${p.slug}`)];
 
   const urls = pages.flatMap((page) =>
     LANGS.map((lang) => {
