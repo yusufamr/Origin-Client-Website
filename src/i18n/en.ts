@@ -4,7 +4,7 @@ export const en: Dictionary = {
   meta: {
     titleSuffix: 'Origin UPVC',
     defaultDescription:
-      'Origin UPVC manufactures and installs premium UPVC windows, shower cabins, and roller shutters built for durability, insulation, and modern design.',
+      'Origin UPVC manufactures and installs premium UPVC windows, doors, roller shutters, and shower cabins in Cairo and across Egypt, built for durability and insulation.',
   },
   nav: {
     home: 'Home',

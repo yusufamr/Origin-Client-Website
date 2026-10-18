@@ -1,26 +1,38 @@
 ---
-// LocalBusiness structured data for the home page only.
+// LocalBusiness structured data for the home page only, in the page's language.
+// Product names come from the same dictionary as the home page product cards.
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { MAPS_LINK, PRODUCTS } from '../lib/site';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const isAr = lang === 'ar';
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
   name: 'Origin UPVC',
-  description:
-    'Origin UPVC manufactures and installs premium UPVC windows, shower cabins, and roller shutters.',
+  alternateName: 'أورجين يو بي في سي',
+  description: t.meta.defaultDescription,
   image: new URL('/og-default.jpg', Astro.site).toString(),
   url: Astro.site?.toString(),
   telephone: '+201273683473',
   priceRange: '$$',
+  hasMap: MAPS_LINK,
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'Badr City',
-    addressRegion: 'Cairo',
+    addressLocality: isAr ? 'مدينة بدر' : 'Badr City',
+    addressRegion: isAr ? 'القاهرة' : 'Cairo',
     addressCountry: 'EG',
   },
-  makesOffer: [
-    { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'UPVC Windows' } },
-    { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Shower Cabins' } },
-    { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Roller Shutters' } },
+  areaServed: [
+    { '@type': 'City', name: isAr ? 'القاهرة' : 'Cairo' },
+    { '@type': 'Country', name: isAr ? 'مصر' : 'Egypt' },
   ],
+  makesOffer: PRODUCTS.map((product) => ({
+    '@type': 'Offer',
+    itemOffered: { '@type': 'Service', name: t.services.items[product.key].title },
+  })),
   sameAs: [
     'https://www.facebook.com/share/1G5k9S5XuD/?mibextid=wwXIfr',
     'https://www.instagram.com/originupvc?igsh=M283YTZlN2luYWlm',
