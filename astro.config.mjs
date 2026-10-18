@@ -21,6 +21,18 @@ export default defineConfig({
   output: 'server',
   adapter: node({ mode: 'standalone' }),
 
+  // Railway terminates HTTPS at its proxy and forwards plain HTTP, so without
+  // trusting X-Forwarded-Proto/Host Astro sees the request as http:// and its
+  // origin check rejects the admin's multipart uploads (browser sends an
+  // https:// Origin) with a 403. Only these hosts' forwarded headers are trusted.
+  security: {
+    allowedDomains: [
+      { hostname: 'www.originupvc.com', protocol: 'https' },
+      { hostname: 'originupvc.com', protocol: 'https' },
+      { hostname: '**.up.railway.app', protocol: 'https' },
+    ],
+  },
+
   // routing: 'manual' — Astro's built-in prefix-enforcement would 404 any
   // non-locale-prefixed route (e.g. /admin, /admin/portfolio). Those routes
   // are intentionally outside the ar/en namespace, so locale handling here is
