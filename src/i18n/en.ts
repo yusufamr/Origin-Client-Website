@@ -3,6 +3,7 @@ import type { Dictionary } from './translations';
 export const en: Dictionary = {
   meta: {
     titleSuffix: 'Origin UPVC',
+    homeTitle: 'UPVC Windows & Doors in Cairo, Egypt',
     defaultDescription:
       'Origin UPVC manufactures and installs premium UPVC windows, doors, roller shutters, and shower cabins in Cairo and across Egypt, built for durability and insulation.',
   },
@@ -22,7 +23,7 @@ export const en: Dictionary = {
   },
   services: {
     title: 'Our Products',
-    subtitle: 'Precision-engineered UPVC solutions for every part of your home',
+    subtitle: 'Precision-engineered UPVC solutions for every part of your home, across Cairo and Egypt',
     cta: 'Request a Quote',
     items: {
       windows: {
@@ -86,6 +87,7 @@ export const en: Dictionary = {
   },
   portfolioPage: {
     title: 'Our Work',
+    seoTitle: 'Our UPVC Windows & Doors Projects',
     description:
       'Browse completed UPVC windows, shower cabins, and roller shutter installations by Origin UPVC.',
     intro: 'A showcase of our recent UPVC installations across homes and businesses.',
@@ -95,6 +97,7 @@ export const en: Dictionary = {
   },
   articlesPage: {
     title: 'Articles',
+    seoTitle: 'UPVC Windows & Doors Guides and Tips',
     description:
       'Guides, tips, and news about UPVC windows, doors, roller shutters, and shower cabins from Origin UPVC.',
     intro: 'Guides and insights to help you choose the right UPVC solutions for your home.',
@@ -111,6 +114,7 @@ export const en: Dictionary = {
   },
   contactPage: {
     title: 'Request a Call',
+    seoTitle: 'Get a Quote for UPVC Windows & Doors',
     description:
       'Leave your phone number and preferred time, and our team will call you back to discuss your UPVC windows, shower cabins, or shutters project.',
     intro: 'Fill in your details and our team will call you back shortly — no obligation.',

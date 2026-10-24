@@ -10,9 +10,10 @@ interface Props {
   description?: string;
   noindex?: boolean;
   ogImage?: string;
+  ogType?: 'website' | 'article';
 }
 
-const { title, description, noindex, ogImage } = Astro.props;
+const { title, description, noindex, ogImage, ogType } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -31,7 +32,7 @@ const direction = dir(lang);
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
-    <SEOHead title={title} description={description} noindex={noindex} ogImage={ogImage} />
+    <SEOHead title={title} description={description} noindex={noindex} ogImage={ogImage} ogType={ogType} />
     <!-- Google tag (gtag.js); public pages only, AdminLayout doesn't include it -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-XL5GSPV0S5"></script>
     <script is:inline>

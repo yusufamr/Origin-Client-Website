@@ -6,9 +6,10 @@ interface Props {
   description?: string;
   noindex?: boolean;
   ogImage?: string;
+  ogType?: 'website' | 'article';
 }
 
-const { title, description, noindex = false, ogImage = '/og-default.jpg' } = Astro.props;
+const { title, description, noindex = false, ogImage = '/og-default.jpg', ogType = 'website' } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -32,7 +33,7 @@ const enAlternate = new URL(getLocalizedPath(Astro.url.pathname, 'en'), Astro.si
 <link rel="alternate" hreflang="en" href={enAlternate} />
 <link rel="alternate" hreflang="x-default" href={arAlternate} />
 
-<meta property="og:type" content="website" />
+<meta property="og:type" content={ogType} />
 <meta property="og:site_name" content={t.meta.titleSuffix} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={pageDescription} />

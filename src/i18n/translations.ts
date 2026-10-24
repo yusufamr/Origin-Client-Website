@@ -4,6 +4,7 @@
 export interface Dictionary {
   meta: {
     titleSuffix: string;
+    homeTitle: string;
     defaultDescription: string;
   };
   nav: {
@@ -42,6 +43,7 @@ export interface Dictionary {
   };
   portfolioPage: {
     title: string;
+    seoTitle: string;
     description: string;
     intro: string;
     empty: string;
@@ -50,6 +52,7 @@ export interface Dictionary {
   };
   articlesPage: {
     title: string;
+    seoTitle: string;
     description: string;
     intro: string;
     empty: string;
@@ -65,6 +68,7 @@ export interface Dictionary {
   };
   contactPage: {
     title: string;
+    seoTitle: string;
     description: string;
     intro: string;
     nameLabel: string;

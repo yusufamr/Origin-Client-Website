@@ -11,6 +11,6 @@ if (!article) {
 }
 ---
 
-<BaseLayout title={article.titleAr} description={article.taglineAr}>
+<BaseLayout title={article.titleAr} description={article.taglineAr} ogImage={article.images[0]} ogType="article">
   <ArticlePage article={article} lang="ar" />
 </BaseLayout>

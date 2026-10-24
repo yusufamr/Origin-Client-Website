@@ -17,6 +17,36 @@ const title = lang === 'ar' ? article.titleAr : article.titleEn;
 const tagline = lang === 'ar' ? article.taglineAr : article.taglineEn;
 const body = lang === 'ar' ? article.articleAr : article.articleEn;
 
+// Article + breadcrumb structured data, so Google can show the article as such
+// in results. Uploaded articles' ids are creation timestamps; the original
+// seeded ones ("1", "2", ...) aren't, so they get no date.
+const site = Astro.site;
+const pageUrl = new URL(path(`articles/${article.slug}`, lang), site).toString();
+const created = Number(article.id);
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: title,
+    description: tagline,
+    inLanguage: lang,
+    mainEntityOfPage: pageUrl,
+    image: article.images.map((image) => new URL(image, site).toString()),
+    ...(created > 1e12 && { datePublished: new Date(created).toISOString() }),
+    author: { '@type': 'Organization', name: 'Origin UPVC', url: site?.toString() },
+    publisher: { '@type': 'Organization', name: 'Origin UPVC', url: site?.toString() },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t.nav.home, item: new URL(path('', lang), site).toString() },
+      { '@type': 'ListItem', position: 2, name: t.nav.articles, item: new URL(path('articles', lang), site).toString() },
+      { '@type': 'ListItem', position: 3, name: title, item: pageUrl },
+    ],
+  },
+];
+
 function getYoutubeEmbedUrl(watchUrl: string): string {
   try {
     const url = new URL(watchUrl);
@@ -27,6 +57,8 @@ function getYoutubeEmbedUrl(watchUrl: string): string {
   }
 }
 ---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
 <PageHeader title={title} intro={tagline}>
   <a
