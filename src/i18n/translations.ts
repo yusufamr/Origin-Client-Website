@@ -93,7 +93,6 @@ export interface Dictionary {
     whatsapp: string;
     phone: string;
     address: string;
-    copyright: string;
   };
   social: {
     instagram: string;

@@ -141,7 +141,6 @@ export const ar: Dictionary = {
     whatsapp: 'واتساب',
     phone: '+20 127 368 3473',
     address: 'مدينة بدر, القاهرة',
-    copyright: 'أورجين يو بي في سي. جميع الحقوق محفوظة.',
   },
   social: {
     instagram: 'انستغرام',

@@ -145,7 +145,6 @@ export const en: Dictionary = {
     whatsapp: 'WhatsApp',
     phone: '+20 127 368 3473',
     address: 'Badr, Cairo',
-    copyright: 'Origin UPVC. All rights reserved.',
   },
   social: {
     instagram: 'Instagram',
